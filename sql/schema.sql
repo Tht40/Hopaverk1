@@ -1,7 +1,7 @@
 CREATE TABLE public.items (
   id SERIAL PRIMARY KEY,
   Title VARCHAR(64) NOT NULL UNIQUE,
-  Price VARCHAR(64) NOT NULL UNIQUE,
+  Price INTEGER NOT NULL UNIQUE,
   description TEXT NOT NULL,
   image longblob NOT NULL,
   category INTEGER NOT NULL,
@@ -26,3 +26,7 @@ CREATE TABLE public.users (
   admin bit NOT NULL
 );
 
+CREATE TABLE public.cart (
+  id UNIQUEIDENTIFIER PRIMARY KEY default NEWID(),
+  created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+)

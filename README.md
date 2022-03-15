@@ -18,3 +18,4 @@ npm start # eða `npm run dev`
 ```
 
 admin aðgangur - username: admin / password: 123
+
