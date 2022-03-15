@@ -1,3 +1,8 @@
+
+# MEMO
+
+Þetta er basicaly bara verkenfi 3, eða það sem ég var kominn áleiðis með það, held að það sé fínn byrjunarreitur alveg eins, þarf bara að taka út og breyta hlutum
+
 # Vef2 2022, verkefni 2 sýnilausn
 
 Sýnilausn á [verkefni 2](https://github.com/vefforritun/vef2-2022-v2).
