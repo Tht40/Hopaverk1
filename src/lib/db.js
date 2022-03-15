@@ -117,7 +117,25 @@ export async function register({ name, comment, event } = {}) {
   return null;
 }
 
-export async function listEvents() {
+
+export async function listItems() {
+  const q = `
+    SELECT
+      id, Title, Price, description, image, category, created, updated
+    FROM
+      items
+  `;
+
+  const result = await query(q);
+
+  if (result) {
+    return result.rows;
+  }
+
+  return null;
+}
+
+/*export async function listEvents() {
   const q = `
     SELECT
       id, name, slug, description, created, updated
@@ -132,7 +150,7 @@ export async function listEvents() {
   }
 
   return null;
-}
+}*/
 
 export async function listUsers() {
   const q = `
