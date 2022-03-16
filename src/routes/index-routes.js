@@ -1,7 +1,7 @@
 import express from 'express';
 import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
-import { listEvent, listEvents, listRegistered, register } from '../lib/db.js';
+import { listEvent, listItems, listRegistered, register } from '../lib/db.js';
 import {
   registrationValidationMiddleware,
   sanitizationMiddleware,
@@ -12,10 +12,10 @@ import {
 export const indexRouter = express.Router();
 
 async function indexRoute(req, res) {
-  const events = await listEvents();
+  const events = await listItems();
 
   res.render('index', {
-    title: 'Viðburðasíðan',
+    title: 'Matseðill',
     admin: false,
     events,
   });
@@ -42,7 +42,7 @@ async function eventRoute(req, res, next) {
 }
 
 async function eventRegisteredRoute(req, res) {
-  const events = await listEvents();
+  const events = await listItems();
 
   res.render('registered', {
     title: 'Viðburðasíðan',

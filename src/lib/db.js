@@ -135,7 +135,7 @@ export async function listItems() {
   return null;
 }
 
-/*export async function listEvents() {
+export async function listEvents() {
   const q = `
     SELECT
       id, name, slug, description, created, updated
@@ -150,7 +150,7 @@ export async function listItems() {
   }
 
   return null;
-}*/
+}
 
 export async function listUsers() {
   const q = `
