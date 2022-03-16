@@ -1,54 +1,50 @@
 CREATE EXTENSION
 IF NOT EXISTS "uuid-ossp";
 
+CREATE TABLE public.categories
+(
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(64) NOT NULL UNIQUE,
+);
+
 CREATE TABLE public.items
 (
   id SERIAL PRIMARY KEY,
-  Title VARCHAR(64) NOT NULL UNIQUE,
-  Price INTEGER NOT NULL UNIQUE,
+  title VARCHAR(64) NOT NULL UNIQUE,
+  price INTEGER NOT NULL,
   description TEXT NOT NULL,
   /*image longblob NOT NULL,*/
-  category INTEGER NOT NULL,
+  category INTEGER NOT NULL REFERENCES categories(id),
   created TIMESTAMP
   WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated TIMESTAMP
   WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-  CREATE TABLE public.categoreis
+
+  CREATE TABLE public.users
   (
-    id SERIAL PRIMARY KEY,
-    Title VARCHAR(64) NOT NULL UNIQUE,
-    comment TEXT,
-    event INTEGER NOT NULL,
+    id serial primary key,
+    name character varying(64) NOT NULL,
+    username character varying(64) NOT NULL,
+    password character varying(256) NOT NULL,
+    admin bit NOT NULL
+  );
+
+  CREATE TABLE public.cart
+  (
+    id uuid PRIMARY KEY default uuid_generate_v4(),
     created TIMESTAMP
     WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
-
 );
 
-    CREATE TABLE public.users
-    (
-      id serial primary key,
-      name character varying(64) NOT NULL,
-      username character varying(64) NOT NULL,
-      password character varying(256) NOT NULL,
-      admin bit NOT NULL
-    );
-
-    CREATE TABLE public.cart
+    CREATE TABLE public.order
     (
       id uuid PRIMARY KEY default uuid_generate_v4(),
       created TIMESTAMP
-      WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
-      CREATE TABLE public.order
-      (
-        id uuid PRIMARY KEY default uuid_generate_v4(),
-        created TIMESTAMP
-        WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
  name VARCHAR
-        (64) NOT NULL
+      (64) NOT NULL
 );
 
 

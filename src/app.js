@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import passport from './lib/login.js';
 import { isInvalid } from './lib/template-helpers.js';
 import { indexRouter } from './routes/index-routes.js';
+import { menuRouter } from './routes/menu-router.js';
 import { usersRouter } from './routes/users-routes.js';
 
 dotenv.config();
@@ -49,6 +50,7 @@ app.locals = {
 };
 
 app.use('/users', usersRouter);
+app.use('/menu', menuRouter);
 app.use('/', indexRouter);
 
 

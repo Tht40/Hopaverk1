@@ -57,6 +57,16 @@ export async function dropSchema(dropFile = DROP_SCHEMA_FILE) {
   return query(data.toString('utf-8'));
 }
 
+export async function getMenu() {
+  const q = `
+    SELECT * FROM public.items
+  `;
+
+  const result = await query(q);
+
+  return result.rows;
+}
+
 export async function createEvent({ name, slug, description } = {}) {
   const q = `
     INSERT INTO events
