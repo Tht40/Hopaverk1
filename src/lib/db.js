@@ -64,9 +64,7 @@ export async function getMenu(offset, limit, category, search) {
 
   let nrOfArguments = 0;
 
-  let q = `
-    SELECT * FROM public.items
-  `;
+  let q = `SELECT * FROM public.items`;
 
   if (category || search) {
     q = q + ' WHERE';
@@ -90,8 +88,6 @@ export async function getMenu(offset, limit, category, search) {
 
   let result;
 
-  console.log(q);
-
   if (category && search) {
     result = await query(q, [category, search, offset, limit]);
   } else if (category) {
@@ -99,7 +95,7 @@ export async function getMenu(offset, limit, category, search) {
   } else if (search) {
     result = await query(q, [search, offset, limit]);
   } else {
-    result = await query(q, [limit, offset]);
+    result = await query(q, [offset, limit]);
   }
 
   return result.rows;
@@ -117,6 +113,20 @@ export async function getMenuItemById(id) {
   }
 
   return results.rows[0];
+}
+
+export async function getMenuItemByTitle(title) {
+  const q = `
+    SELECT * FROM public.items WHERE title=$1
+  `;
+
+  const results = await query(q, [title]);
+
+  if (results.rows.length === 0) {
+    return null;
+  }
+
+  return results.rows;
 }
 
 export async function getCategoriesPage(offset, limit) {
@@ -161,12 +171,19 @@ export async function insertMenuItem(title, description, category, price, url = 
       VALUES ($1, $2, $3, $4, $5) RETURNING id
   `;
 
-  console.log(q);
   const result = await query(q, [title, price, description, category, url]);
-  console.log('result' + result);
+
   const { id } = result.rows[0];
 
   return id;
+}
+
+export async function deleteMenuItem(id) {
+  const q = `
+    DELETE FROM public.items WHERE id=$1
+  `;
+
+  await query(q, [id]);
 }
 
 // Updatear ekki description, erum ekki að útfæra partial update

@@ -9,7 +9,6 @@ cloudinary.config({
 
 export async function uploadFileBuffer(itemId, fileBuffer) {
   cloudinary.uploader.upload_stream((result) => {
-    console.log(result.secure_url);
     updateMenuItemImage(itemId, result.secure_url);
   }).end(fileBuffer);
 }

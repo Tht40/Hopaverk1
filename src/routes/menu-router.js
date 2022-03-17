@@ -4,7 +4,12 @@ import multer from 'multer';
 import xss from 'xss';
 import { catchErrors } from '../lib/catch-errors.js';
 import { uploadFileBuffer } from '../lib/cloudinary.js';
-import { getCategoriesPage, getMenu, getMenuItemById, insertMenuItem } from '../lib/db.js';
+import {
+    deleteMenuItem,
+    getCategoriesPage,
+    getMenu,
+    getMenuItemById, getMenuItemByTitle, insertMenuItem
+} from '../lib/db.js';
 
 export const menuRouter = express.Router();
 export const categoriesRouter = express.Router();
@@ -80,11 +85,11 @@ async function getMenuByIdRoute(req, res, next) {
 async function postMenuItemRoute(req, res) {
     // TODO: Tékka hvort að notandi sé loggaður inn
     const valResults = validationResult(req);
-    let fileError = false;
+    let otherError = false;
     let errors = valResults.errors;
 
     if (!req.file) {
-        fileError = true;
+        otherError = true;
         errors.push({
             value: '',
             msg: 'Picture cannot be empty',
@@ -92,7 +97,7 @@ async function postMenuItemRoute(req, res) {
             location: 'body',
         });
     } else if (req.file.mimetype != 'image/png' && req.file.mimetype != 'image/jpeg') {
-        fileError = true;
+        otherError = true;
         errors.push({
             value: '',
             msg: 'Picture not correct type',
@@ -101,22 +106,59 @@ async function postMenuItemRoute(req, res) {
         });
     }
 
-    if (!valResults.isEmpty() || fileError) {
-        res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
-        return;
-    }
-
     const {
         title, description, category, price
     } = req.body;
 
-    const itemId = await insertMenuItem(title, description, category, price);
+    const itemResult = await getMenuItemByTitle(title);
 
-    console.log(itemId);
+    if (itemResult) {
+        otherError = true;
+        errors.push({
+            value: '',
+            msg: 'Title taken',
+            param: 'title',
+            location: 'body',
+        });
+    }
+
+    if (!valResults.isEmpty() || otherError) {
+        res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+        return;
+    }
+
+    const itemId = await insertMenuItem(title, description, category, price);
 
     uploadFileBuffer(itemId, req.file.buffer);
 
     res.status(201).json({ msg: '201 Created' });
+}
+
+async function deleteMenuItemRoute(req, res, next) {
+    //TODO: passa að notandi þarf að vera loggaður inn til þess að gera þetta
+
+    const valResults = validationResult(req);
+    const { id } = req.params;
+
+    if (!valResults.isEmpty()) {
+        res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+        return;
+    }
+
+    const item = await getMenuItemById(id);
+
+    if (!item) {
+        next();
+        return;
+    }
+
+    await deleteMenuItem(id);
+
+    res.json({ msg: '200 Deleted' });
+}
+
+async function updateMenuItemRoute() {
+
 }
 
 async function getCategoriesRoute(req, res) {
@@ -216,13 +258,14 @@ const postMenuItemXssClean = [
     body('category')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.post('/', /*postMenuItemValidators, postMenuItemXssClean,*/ upload.single('picture'), catchErrors(postMenuItemRoute))
+menuRouter.post('/', upload.single('picture'), postMenuItemValidators, postMenuItemXssClean, catchErrors(postMenuItemRoute))
 
 const menuItemByIdValidationChain = [
     param('id')
         .trim()
         .isInt()
-        .withMessage('id must be an integer'),
+        .withMessage('id must be an integer')
+        .toInt(),
 ];
 
 const menuItemByIdXssClean = [
@@ -230,6 +273,18 @@ const menuItemByIdXssClean = [
         .customSanitizer((value) => xss(value)),
 ];
 menuRouter.get('/:id', menuItemByIdValidationChain, menuItemByIdXssClean, catchErrors(getMenuByIdRoute));
+
+const deleteMenuItemValidation = [
+    param('id')
+        .isInt()
+        .withMessage('Id verður að vera tala')
+        .toInt(),
+];
+const deleteMenuItemXssClean = [
+    param('id')
+        .customSanitizer((value) => xss(value)),
+];
+menuRouter.delete('/:id', catchErrors(deleteMenuItemRoute))
 
 // Route fyrir categories router
 const categoriesValidationChain = [
