@@ -49,12 +49,12 @@ CREATE TABLE public.items
 
     CREATE TABLE public.line
     (
-      cartid VARCHAR(64),
-      id VARCHAR(64),
+      cartid uuid,
+      id INTEGER,
       total INTEGER NOT NULL,
       FOREIGN KEY (cartid) REFERENCES cart(cartid),
       FOREIGN KEY (id) REFERENCES items(id)
 
-    )
+    );
 
 /*CONSTRAINT event FOREIGN KEY (event) REFERENCES events (id);*/

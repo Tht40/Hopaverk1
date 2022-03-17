@@ -284,8 +284,7 @@ export async function findCartById(id) {
 
 export async function findLinesInCart(cartid) {
   const q = `
-    SELECT*
-      id
+    SELECT *
     FROM
       line
     WHERE
