@@ -33,7 +33,7 @@ CREATE TABLE public.items
 
   CREATE TABLE public.cart
   (
-    id uuid PRIMARY KEY default uuid_generate_v4(),
+    cartid uuid PRIMARY KEY default uuid_generate_v4(),
     created TIMESTAMP
     WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -47,7 +47,14 @@ CREATE TABLE public.items
       (64) NOT NULL
 );
 
+    CREATE TABLE public.line
+    (
+      cartid VARCHAR(64),
+      id VARCHAR(64),
+      total INTEGER NOT NULL,
+      FOREIGN KEY (cartid) REFERENCES cart(cartid),
+      FOREIGN KEY (id) REFERENCES items(id)
 
-/*CONSTRAINT event FOREIGN KEY
-      (event) REFERENCES events
-      (id);*/
+    )
+
+/*CONSTRAINT event FOREIGN KEY (event) REFERENCES events (id);*/
