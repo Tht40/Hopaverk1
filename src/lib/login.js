@@ -61,7 +61,7 @@ export function ensureLoggedIn(req, res, next) {
     return next();
   }
 
-  return res.redirect('/users/login');
+  return res.json({ message: 'Notandi ekki skráður inn.' });
 }
 
 export default passport;
