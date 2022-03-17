@@ -1,13 +1,38 @@
-/*
+
 import express from 'express';
+import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
+import { createCart } from '../lib/db.js';
+
 
 export const cartRouter = express.Router();
 
+async function postCartRoute(req, res, next) {
+  const valResults = validationResult(req);
+
+
+  if (!valResults.isEmpty()) {
+    next();
+    return
+  }
+
+  const newCart = await createCart()
+
+  if (!newCart) {
+    next();
+    return;
+  }
+
+  res.json({ data: newCart });
+}
+/*
+async function getCartidRoute(req, res, next){
+
+}
 
 
 async function eventRoute(req, res, next) {
-  const { slug } = req.params;
+  const { cartid } = req.params;
   const cart = await listCart(slug);
 
   if (!cart) {
@@ -16,14 +41,17 @@ async function eventRoute(req, res, next) {
 
   return cart  total price og öllum items í cart ;
 }
+*/
 
 
-cartRouter.get('/cart/:slug', catchErrors(eventRoute));
-cartRouter.post('/cart/:slug', (req, res) => {
+cartRouter.post('/', catchErrors(postCartRoute));
 
-  const { }
+/*
+cartRouter.get('/:cartid', );
+cartRouter.post('/:cartid,' (req,res) => {
+  const {item, }
 });
-cartRouter.delete('/cart/:slug',);
+cartRouter.delete('/:slug',);
 
 cartRouter.get('cart/:cartid/line/:id',);
 cartRouter.patch('cart/:cartid/line/:id',);

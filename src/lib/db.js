@@ -59,7 +59,7 @@ export async function dropSchema(dropFile = DROP_SCHEMA_FILE) {
 
 export async function getMenu(offset, limit, category, search) {
   if (search) {
-    search = '%' + search + '%';
+    search = `%${search}%`;
   }
 
   let nrOfArguments = 0;
@@ -69,24 +69,24 @@ export async function getMenu(offset, limit, category, search) {
   `;
 
   if (category || search) {
-    q = q + ' WHERE';
+    q += ' WHERE';
   }
 
   if (category) {
     nrOfArguments += 1;
-    q = q + ` CATEGORY = $${nrOfArguments}`;
+    q += ` CATEGORY = $${nrOfArguments}`;
   }
 
   if (category && search) {
-    q = q + ' AND';
+    q += ' AND';
   }
 
   if (search) {
     nrOfArguments += 1;
-    q = q + ` (LOWER(title) like LOWER($${nrOfArguments}) OR LOWER(description) LIKE LOWER($${nrOfArguments}))`;
+    q += ` (LOWER(title) like LOWER($${nrOfArguments}) OR LOWER(description) LIKE LOWER($${nrOfArguments}))`;
   }
 
-  q = q + ` OFFSET $${nrOfArguments + 1} LIMIT $${nrOfArguments + 2}`;
+  q += ` OFFSET $${nrOfArguments + 1} LIMIT $${nrOfArguments + 2}`;
 
   let result;
 
@@ -129,6 +129,23 @@ export async function getCategoriesPage(offset, limit) {
   return results.rows;
 }
 
+
+export async function createCart() {
+  const q = `
+    INSERT INTO cart
+    VALUES
+    (DEFAULT, DEFAULT)
+    RETURNING cartid;
+  `;
+
+  const result = await query(q);
+
+  if (result) {
+    return result.rows[0];
+  }
+  return null;
+}
+
 export async function createEvent({ name, slug, description } = {}) {
   const q = `
     INSERT INTO events
@@ -163,7 +180,7 @@ export async function insertMenuItem(title, description, category, price, url = 
 
   console.log(q);
   const result = await query(q, [title, price, description, category, url]);
-  console.log('result' + result);
+  console.log(`result${result}`);
   const { id } = result.rows[0];
 
   return id;
@@ -221,6 +238,44 @@ export async function listItems() {
   `;
 
   const result = await query(q);
+
+  if (result) {
+    return result.rows;
+  }
+
+  return null;
+}
+
+export async function findCartById(id) {
+  const q = `
+    SELECT
+      cartid
+    FROM
+      cart
+    WHERE
+      cartid = $1
+  `;
+
+  const result = await query(q, [id]);
+
+  if (result && result.rowCount === 1) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+
+export async function findLinesInCart(cartid) {
+  const q = `
+    SELECT*
+      id
+    FROM
+      line
+    WHERE
+      id = $1
+  `
+
+  const result = await query(q, [cartid]);
 
   if (result) {
     return result.rows;
