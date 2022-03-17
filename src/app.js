@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 import passport from './lib/login.js';
 import { isInvalid } from './lib/template-helpers.js';
 import { indexRouter } from './routes/index-routes.js';
-import { menuRouter } from './routes/menu-router.js';
+import { categoriesRouter, menuRouter } from './routes/menu-router.js';
 import { usersRouter } from './routes/users-routes.js';
 
 dotenv.config();
@@ -51,13 +51,13 @@ app.locals = {
 
 app.use('/users', usersRouter);
 app.use('/menu', menuRouter);
+app.use('/categories', categoriesRouter);
 app.use('/', indexRouter);
 
 
 /** Middleware sem sér um 404 villur. */
 app.use((req, res) => {
-  const title = 'Síða fannst ekki';
-  res.status(404).render('error', { title });
+  res.status(404).json({ msg: '404 Not found' });
 });
 
 

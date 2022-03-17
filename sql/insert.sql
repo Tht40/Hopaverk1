@@ -1,4 +1,9 @@
-INSERT INTO items
+INSERT INTO public.categories
+    (title)
+VALUES
+    ('Pizzur');
+
+INSERT INTO public.items
     (Title, Price, description, category)
 VALUES
     ('Ananas', '1890', 'Pizza með ananas', 1);

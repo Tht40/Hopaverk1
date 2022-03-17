@@ -57,14 +57,76 @@ export async function dropSchema(dropFile = DROP_SCHEMA_FILE) {
   return query(data.toString('utf-8'));
 }
 
-export async function getMenu() {
-  const q = `
+export async function getMenu(offset, limit, category, search) {
+  if (search) {
+    search = '%' + search + '%';
+  }
+
+  let nrOfArguments = 0;
+
+  let q = `
     SELECT * FROM public.items
   `;
 
-  const result = await query(q);
+  if (category || search) {
+    q = q + ' WHERE';
+  }
+
+  if (category) {
+    nrOfArguments += 1;
+    q = q + ` CATEGORY = $${nrOfArguments}`;
+  }
+
+  if (category && search) {
+    q = q + ' AND';
+  }
+
+  if (search) {
+    nrOfArguments += 1;
+    q = q + ` (LOWER(title) like LOWER($${nrOfArguments}) OR LOWER(description) LIKE LOWER($${nrOfArguments}))`;
+  }
+
+  q = q + ` OFFSET $${nrOfArguments + 1} LIMIT $${nrOfArguments + 2}`;
+
+  let result;
+
+  console.log(q);
+
+  if (category && search) {
+    result = await query(q, [category, search, offset, limit]);
+  } else if (category) {
+    result = await query(q, [category, offset, limit]);
+  } else if (search) {
+    result = await query(q, [search, offset, limit]);
+  } else {
+    result = await query(q, [limit, offset]);
+  }
 
   return result.rows;
+}
+
+export async function getMenuItemById(id) {
+  const q = `
+    SELECT * FROM public.items WHERE id = $1;
+  `;
+
+  const results = await query(q, [id]);
+
+  if (results.rows.length === 0) {
+    return null;
+  }
+
+  return results.rows[0];
+}
+
+export async function getCategoriesPage(offset, limit) {
+  const q = `
+    SELECT * FROM public.categories LIMIT $1 OFFSET $2
+  `;
+
+  const results = await query(q, [limit, offset]);
+
+  return results.rows;
 }
 
 export async function createEvent({ name, slug, description } = {}) {

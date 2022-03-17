@@ -4,7 +4,7 @@ IF NOT EXISTS "uuid-ossp";
 CREATE TABLE public.categories
 (
   id SERIAL PRIMARY KEY,
-  title VARCHAR(64) NOT NULL UNIQUE,
+  title VARCHAR(64) NOT NULL UNIQUE
 );
 
 CREATE TABLE public.items
@@ -48,4 +48,6 @@ CREATE TABLE public.items
 );
 
 
-/*CONSTRAINT event FOREIGN KEY (event) REFERENCES events (id)*/
+/*CONSTRAINT event FOREIGN KEY
+      (event) REFERENCES events
+      (id);*/
