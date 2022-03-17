@@ -1,7 +1,8 @@
 INSERT INTO items
     (Title, Price, description, category)
 VALUES
-    ('Ananas', '1890', 'Pizza með ananas', 1);
+    ('Ananas pizza', '1890', 'Pizza með ananas', 1);
+    ('Margaríta pizza', '1290', 'Pizza með engu', 1);
 
 INSERT INTO users
     (name, username, password, admin)
