@@ -147,6 +147,28 @@ export async function createEvent({ name, slug, description } = {}) {
   return null;
 }
 
+export async function updateMenuItemImage(id, url) {
+  const q = `
+    UPDATE public.items SET image=$1 WHERE id=$2
+  `;
+
+  await query(q, [url, id]);
+}
+
+export async function insertMenuItem(title, description, category, price, url = 'Not uploaded') {
+  const q = `
+    INSERT INTO public.items (title, price, description, category, image)
+      VALUES ($1, $2, $3, $4, $5) RETURNING id
+  `;
+
+  console.log(q);
+  const result = await query(q, [title, price, description, category, url]);
+  console.log('result' + result);
+  const { id } = result.rows[0];
+
+  return id;
+}
+
 // Updatear ekki description, erum ekki að útfæra partial update
 export async function updateEvent(id, { name, slug, description } = {}) {
   const q = `

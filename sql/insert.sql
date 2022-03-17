@@ -4,10 +4,9 @@ VALUES
     ('Pizzur');
 
 INSERT INTO public.items
-    (Title, Price, description, category)
+    (Title, Price, description, category, image)
 VALUES
-    ('Ananas pizza', '1890', 'Pizza með ananas', 1);
-    ('Margaríta pizza', '1290', 'Pizza með engu', 1);
+    ('Ananas pizza', '1890', 'Pizza með ananas', 1, 'https://res.cloudinary.com/dil4cpy2p/image/upload/v1647543490/k8otldcxtmfsusdtehrd.png');
 
 INSERT INTO users
     (name, username, password, admin)

@@ -1,11 +1,15 @@
 import express from 'express';
-import { param, query, validationResult } from 'express-validator';
+import { body, param, query, validationResult } from 'express-validator';
+import multer from 'multer';
 import xss from 'xss';
 import { catchErrors } from '../lib/catch-errors.js';
-import { getCategoriesPage, getMenu, getMenuItemById } from '../lib/db.js';
+import { uploadFileBuffer } from '../lib/cloudinary.js';
+import { getCategoriesPage, getMenu, getMenuItemById, insertMenuItem } from '../lib/db.js';
 
 export const menuRouter = express.Router();
 export const categoriesRouter = express.Router();
+
+const upload = multer();
 
 async function getMenuRoute(req, res) {
     const { category, search } = req.query;
@@ -73,6 +77,48 @@ async function getMenuByIdRoute(req, res, next) {
     res.json({ data: menuItem });
 }
 
+async function postMenuItemRoute(req, res) {
+    // TODO: Tékka hvort að notandi sé loggaður inn
+    const valResults = validationResult(req);
+    let fileError = false;
+    let errors = valResults.errors;
+
+    if (!req.file) {
+        fileError = true;
+        errors.push({
+            value: '',
+            msg: 'Picture cannot be empty',
+            param: 'picture',
+            location: 'body',
+        });
+    } else if (req.file.mimetype != 'image/png' && req.file.mimetype != 'image/jpeg') {
+        fileError = true;
+        errors.push({
+            value: '',
+            msg: 'Picture not correct type',
+            param: 'picture',
+            location: 'body',
+        });
+    }
+
+    if (!valResults.isEmpty() || fileError) {
+        res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+        return;
+    }
+
+    const {
+        title, description, category, price
+    } = req.body;
+
+    const itemId = await insertMenuItem(title, description, category, price);
+
+    console.log(itemId);
+
+    uploadFileBuffer(itemId, req.file.buffer);
+
+    res.status(201).json({ msg: '201 Created' });
+}
+
 async function getCategoriesRoute(req, res) {
     const valResults = validationResult(req);
     let { page } = req.query;
@@ -137,6 +183,41 @@ const menuItemsXssClean = [
         .customSanitizer((value) => xss(value)),
 ];
 menuRouter.get('/', menuItemsValidationChain, menuItemsXssClean, catchErrors(getMenuRoute));
+
+const postMenuItemValidators = [
+    body('title')
+        .trim()
+        .escape()
+        .isLength({ min: 1 })
+        .withMessage('Title cannot be empty'),
+    body('price')
+        .trim()
+        .isInt()
+        .withMessage('Price needs to be an integer')
+        .toInt(),
+    body('description')
+        .trim()
+        .escape()
+        .isLength({ min: 1 })
+        .withMessage('description cannot be empty'),
+    body('category')
+        .trim()
+        .isInt()
+        .withMessage('category must be an integer')
+        .toInt(),
+];
+const postMenuItemXssClean = [
+    body('title')
+        .customSanitizer((value) => xss(value)),
+    body('price')
+        .customSanitizer((value) => xss(value)),
+    body('description')
+        .customSanitizer((value) => xss(value)),
+    body('category')
+        .customSanitizer((value) => xss(value)),
+];
+menuRouter.post('/', /*postMenuItemValidators, postMenuItemXssClean,*/ upload.single('picture'), catchErrors(postMenuItemRoute))
+
 const menuItemByIdValidationChain = [
     param('id')
         .trim()
@@ -148,7 +229,6 @@ const menuItemByIdXssClean = [
     param('id')
         .customSanitizer((value) => xss(value)),
 ];
-
 menuRouter.get('/:id', menuItemByIdValidationChain, menuItemByIdXssClean, catchErrors(getMenuByIdRoute));
 
 // Route fyrir categories router

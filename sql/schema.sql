@@ -13,7 +13,7 @@ CREATE TABLE public.items
   title VARCHAR(64) NOT NULL UNIQUE,
   price INTEGER NOT NULL,
   description TEXT NOT NULL,
-  /*image longblob NOT NULL,*/
+  image VARCHAR(256) NOT NULL,
   category INTEGER NOT NULL REFERENCES categories(id),
   created TIMESTAMP
   WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
