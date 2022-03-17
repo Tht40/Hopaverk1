@@ -8,7 +8,7 @@ import {
     deleteMenuItem,
     getCategoriesPage,
     getMenu,
-    getMenuItemById, getMenuItemByTitle, insertMenuItem
+    getMenuItemById, getMenuItemByTitle, insertMenuItem, updateMenuItem
 } from '../lib/db.js';
 
 export const menuRouter = express.Router();
@@ -157,8 +157,62 @@ async function deleteMenuItemRoute(req, res, next) {
     res.json({ msg: '200 Deleted' });
 }
 
-async function updateMenuItemRoute() {
+async function updateMenuItemRoute(req, res, next) {
+    // TODO: tékka hvort að notandi sé skráður inn.
+    const valResults = validationResult(req);
 
+    if (!valResults.isEmpty()) {
+        res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+        return;
+    }
+
+    const {
+        title,
+        price,
+        description,
+        category,
+    } = req.body;
+
+    const { id } = req.params;
+
+    const item = await getMenuItemById(id);
+
+    if (!item) {
+        next();
+        return;
+    }
+
+    const item2 = await getMenuItemByTitle(title);
+
+    if (item2 && item2.id != id) {
+        res.status(400).json({
+            msg: '400 Bad request', data: [{
+                msg: 'Menu item with same title already exists',
+            }]
+        });
+        return;
+    }
+
+    if (!title && !price && !description && !category) {
+        res.json({ msg: '200 Updated' });
+        return;
+    }
+
+    if (category) {
+        const categoryCheck = await getCategoryById(category);
+        if (!categoryCheck) {
+            res.status(400).json({
+                msg: '400 Bad request', data: [{
+                    msg: 'category does not exist',
+                }]
+            });
+            return;
+        }
+    }
+
+    await updateMenuItem(id, title, price, description, category);
+
+    res.json({ msg: '200 Updated' });
 }
 
 async function getCategoriesRoute(req, res) {
@@ -284,7 +338,47 @@ const deleteMenuItemXssClean = [
     param('id')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.delete('/:id', catchErrors(deleteMenuItemRoute))
+menuRouter.delete('/:id', deleteMenuItemValidation, deleteMenuItemXssClean, catchErrors(deleteMenuItemRoute))
+
+const updateMenuItemValidation = [
+    param('id')
+        .isInt()
+        .withMessage('Id verður að vera tala')
+        .toInt(),
+    body('title')
+        .optional()
+        .trim()
+        .escape()
+        .isLength({ max: 64 })
+        .withMessage('title cannot be longer than 64 letters'),
+    body('price')
+        .optional()
+        .isInt()
+        .withMessage('Price must be an integer')
+        .toInt(),
+    body('description')
+        .optional()
+        .trim()
+        .escape(),
+    body('category')
+        .optional()
+        .isInt()
+        .withMessage('category must be an integer')
+        .toInt(),
+];
+const updateMenuItemXssClean = [
+    param('id')
+        .customSanitizer((value) => xss(value)),
+    body('title')
+        .customSanitizer((value) => xss(value)),
+    body('price')
+        .customSanitizer((value) => xss(value)),
+    body('description')
+        .customSanitizer((value) => xss(value)),
+    body('category')
+        .customSanitizer((value) => xss(value)),
+];
+menuRouter.patch('/:id', updateMenuItemValidation, updateMenuItemXssClean, catchErrors(updateMenuItemRoute));
 
 // Route fyrir categories router
 const categoriesValidationChain = [

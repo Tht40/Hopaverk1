@@ -126,7 +126,7 @@ export async function getMenuItemByTitle(title) {
     return null;
   }
 
-  return results.rows;
+  return results.rows[0];
 }
 
 export async function getCategoriesPage(offset, limit) {
@@ -180,6 +180,46 @@ export async function updateMenuItemImage(id, url) {
   `;
 
   await query(q, [url, id]);
+}
+
+export async function updateMenuItem(id, title, price, description, category) {
+  let q = `
+    UPDATE public.items SET
+  `;
+
+  let params = [];
+  let nrOfParams = 0;
+
+  if (title) {
+    nrOfParams = nrOfParams + 1;
+    q = q + ` title=$${nrOfParams},`;
+    params.push(title);
+  }
+
+  if (price) {
+    nrOfParams = nrOfParams + 1;
+    q = q + ` price=$${nrOfParams},`;
+    params.push(price);
+  }
+
+  if (description) {
+    nrOfParams = nrOfParams + 1;
+    q = q + ` description=$${nrOfParams},`;
+    params.push(description);
+  }
+
+  if (category) {
+    nrOfParams = nrOfParams + 1;
+    q = q + ` category=$${nrOfParams},`;
+    params.push(category);
+  }
+
+  q = q + ` updated=CURRENT_TIMESTAMP`;
+
+  q = q + ` WHERE id=$${nrOfParams + 1}`;
+  params.push(id);
+
+  await query(q, params);
 }
 
 export async function insertMenuItem(title, description, category, price, url = 'Not uploaded') {
