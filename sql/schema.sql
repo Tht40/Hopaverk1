@@ -51,7 +51,7 @@ CREATE TABLE public.items
     (
       cartid uuid,
       id INTEGER,
-      total INTEGER NOT NULL,
+      total INTEGER,
       FOREIGN KEY (cartid) REFERENCES cart(cartid),
       FOREIGN KEY (id) REFERENCES items(id)
 
