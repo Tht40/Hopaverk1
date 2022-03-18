@@ -130,6 +130,23 @@ export async function getMenuItemByTitle(title) {
   return results.rows[0];
 }
 
+export async function getOrderByName(name) {
+  const q = `
+    SELECT * FROM public.order WHERE name=$1
+  `;
+
+  const results = await query(q, [name]);
+
+  if (results.rows.length === 0) {
+    return null;
+  }
+
+  return results.rows[0];
+}
+
+
+
+
 export async function getMenuItemsByCategory(category) {
   const q = `
     SELECT * FROM public.items WHERE category=$1
@@ -460,13 +477,13 @@ export async function createOrders() {
 
 
 export async function listOrders() {
-  const q = 'SELECT * FROM orders';
+  const q = 'SELECT * FROM public.order ORDER BY created';
 
   try {
     const result = await query(q);
 
-    if (result.rowCount === 1) {
-      return result.rows[0];
+    if (result) {
+      return result.rows;
     }
   } catch (e) {
     console.error('Engar pantanir fundust');
