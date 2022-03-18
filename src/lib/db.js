@@ -355,6 +355,14 @@ export async function deleteCart(id) {
   await query(q, [id]);
 }
 
+export async function deleteLine(id) {
+  const q = `
+    DELETE FROM public.line WHERE id = $1;
+  `;
+
+  await query(q, [id]);
+}
+
 // Updatear ekki description, erum ekki að útfæra partial update
 export async function updateEvent(id, { name, slug, description } = {}) {
   const q = `
