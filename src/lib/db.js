@@ -129,6 +129,20 @@ export async function getMenuItemByTitle(title) {
   return results.rows[0];
 }
 
+export async function getMenuItemsByCategory(category) {
+  const q = `
+    SELECT * FROM public.items WHERE category=$1
+  `;
+
+  const results = await query(q, [category]);
+
+  if (results.rows.length === 0) {
+    return null;
+  }
+
+  return results.rows;
+}
+
 export async function getCategoriesPage(offset, limit) {
   const q = `
     SELECT * FROM public.categories LIMIT $1 OFFSET $2

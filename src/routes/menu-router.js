@@ -5,14 +5,14 @@ import xss from 'xss';
 import { catchErrors } from '../lib/catch-errors.js';
 import { uploadFileBuffer } from '../lib/cloudinary.js';
 import {
-    deleteCategory,
-    deleteMenuItem,
+    deleteCategory, deleteMenuItem,
     getCategoriesPage,
     getCategoryById,
     getCategoryByTitle,
     getMenu,
     getMenuItemById,
     getMenuItemByTitle,
+    getMenuItemsByCategory,
     insertCategory,
     insertMenuItem,
     updateMenuItem
@@ -282,7 +282,7 @@ async function createCategoryRoute(req, res) {
     res.json({ msg: '200 Created', data: [results] });
 }
 
-async function deleteCategoryRoute(req, res) {
+async function deleteCategoryRoute(req, res, next) {
     // TODO: Tékka hvort notandi sé loggaður inn
     const valResults = validationResult(req);
     const { id } = req.params;
@@ -292,8 +292,6 @@ async function deleteCategoryRoute(req, res) {
         return;
     }
 
-    console.log(id);
-
     const checkIfExists = await getCategoryById(id);
 
     if (!checkIfExists) {
@@ -301,7 +299,18 @@ async function deleteCategoryRoute(req, res) {
         return;
     }
 
-    //TODO: Tékka hvort að það séu einhver items aðnota þetta ctegory
+    // Athuga hvort að það séu einhver item sem tilheyra þessum flokki.
+    const itemsInCategory = await getMenuItemsByCategory(id);
+
+    if (itemsInCategory) {
+        res.status(400).json({
+            msg: '400 Bad request', data: [{
+                msg: 'Cannot delete category because there are items that belong to this category',
+            }]
+        });
+
+        return;
+    }
 
     await deleteCategory(id);
 
