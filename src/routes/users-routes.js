@@ -105,7 +105,7 @@ usersRouter.patch('/me', jwtPassport.authenticate('jwt', { session: false }),
 usersRouter.get('/:slug', jwtPassport.authenticate('jwt', { session: false }),
   ensureIsAdmin, catchErrors(viewUser));
 usersRouter.patch('/:slug', jwtPassport.authenticate('jwt', { session: false }),
-  ensureIsAdmin, catchErrors(patchUserAdmin));
+  ensureIsAdmin, catchErrors(patchUser));
 
 usersRouter.get('/', jwtPassport.authenticate('jwt', { session: false }),
   ensureIsAdmin, catchErrors(allUsers));
