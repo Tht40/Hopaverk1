@@ -181,6 +181,32 @@ export async function getCategoryById(id) {
   return results.rows[0];
 }
 
+export async function getPasswordByUsername(username) {
+  const q = `
+    SELECT password from public.users WHERE username=$1
+  `;
+
+  const results = await query(q, [username]);
+
+  if (results.rows.length === 0) {
+    return null;
+  }
+  return results.rows[0].password;
+}
+
+export async function getUserByUsername(username) {
+  const q = `
+  SELECT id, name, username FROM public.users WHERE username=$1
+`;
+
+  const results = await query(q, [username]);
+
+  if (results.rows.length === 0) {
+    return null;
+  }
+
+  return results.rows[0];
+}
 
 export async function createCart() {
   const q = `

@@ -3,7 +3,7 @@ import express from 'express';
 import session from 'express-session';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import passport from './lib/login.js';
+import { jwtPassport } from './lib/jwt-tools.js';
 import { isInvalid } from './lib/template-helpers.js';
 import { cartRouter } from './routes/cart-routes.js';
 import { indexRouter } from './routes/index-routes.js';
@@ -44,12 +44,11 @@ app.use(
   })
 );
 
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.locals = {
   isInvalid,
 };
+
+app.use(jwtPassport.initialize());
 
 app.use('/users', usersRouter);
 app.use('/menu', menuRouter);

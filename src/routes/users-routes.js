@@ -1,12 +1,51 @@
+import bcrypt from 'bcrypt';
 import express from 'express';
+import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
-import { listUsers } from '../lib/db.js';
-import passport, { ensureLoggedIn } from '../lib/login.js';
+import { getPasswordByUsername, getUserByUsername, listUsers } from '../lib/db.js';
+import { generateAccessToken } from '../lib/jwt-tools.js';
+import { ensureLoggedIn } from '../lib/login.js';
 import { createUser, findById, findByUsername } from '../lib/users.js';
 
 export const usersRouter = express.Router();
 
+// Föll fyrir login routerinn
+async function loginRoute(req, res) {
+  const valResults = validationResult(req);
 
+  if (!valResults.isEmpty()) {
+    res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+    return;
+  }
+
+  const { username, password } = req.body;
+
+  const selectedPassword = await getPasswordByUsername(username);
+  const selectedUser = await getUserByUsername(username);
+
+  if (!selectedPassword) {
+    res.status(403).json({ msg: '403 Forbidden password or username incorrect' });
+    return;
+  }
+
+  const passwordCorrect = await bcrypt.compare(password, selectedPassword);
+
+  if (!passwordCorrect) {
+    res.status(403).json({ msg: '403 Forbidden password or username incorrect' });
+    return;
+  }
+
+  const userToSend = {
+    id: selectedUser.id,
+    name: selectedUser.name,
+    username: selectedUser.username,
+    admin: selectedUser.admin,
+  };
+
+  const token = generateAccessToken(userToSend);
+
+  res.json({ token });
+}
 
 async function allUsers(req, res) {
   const users = await listUsers();
@@ -36,17 +75,7 @@ usersRouter.get('/', ensureLoggedIn, catchErrors(allUsers));
 
 usersRouter.post(
   '/login',
-
-  // Þetta notar strat að ofan til að skrá notanda inn
-  passport.authenticate('local', {
-    failureMessage: 'Notandanafn eða lykilorð vitlaust.',
-    failureRedirect: '/users/login',
-  }),
-
-  // Ef við komumst hingað var notandi skráður inn, senda á /admin
-  (req, res) => {
-    res.json({ token: 'token here' });
-  }
+  catchErrors(loginRoute)
 );
 
 // býr til nýjann account
