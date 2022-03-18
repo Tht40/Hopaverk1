@@ -3,8 +3,8 @@ import express from 'express';
 import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
 import {
-  addToCart,
-  createCart, deleteCart, findCartById, findLinesInCart, getLineInCart, getMenuItemById, updateCartLine
+  addToCart, createCart, deleteCart, findCartById, findLinesInCart,
+  getLineInCart, getMenuItemById, updateCartLine
 } from '../lib/db.js';
 
 
@@ -41,7 +41,6 @@ async function getCartidRoute(req, res, next) {
   }
 
   const result = await findLinesInCart(cartid)
-  console.log(result);
   if (!result) {
     next();
     return;
@@ -56,8 +55,9 @@ async function getCartidRoute(req, res, next) {
   let totalcost = 0;
   let totalitems = 0;
   // loopa til að telja total items i körfu og price
-  for (let i = 0; i < result.length; i++) {
+  for (let i = 0; i < result.length; i += 1) {
     const { itemid } = result[i];
+    // eslint-disable-next-line no-await-in-loop
     const itemdata = await getMenuItemById(itemid);
     const cost = itemdata.price * result[i].total;
     const totaldata = result[i].total
@@ -160,7 +160,7 @@ async function getoneLine(req, res, next) {
 
 }
 
-async function patchCartLine(req, res, next) {
+async function patchCartLine(req, res) {
   const valResults = validationResult(req);
 
   if (!valResults.isEmpty()) {
@@ -170,9 +170,6 @@ async function patchCartLine(req, res, next) {
 
   const { total } = req.body;
   const { cartid, id } = req.params;
-  console.log(cartid);
-  console.log(id);
-  console.log(total);
   const line = await getLineInCart(cartid, id);
 
   if (!line) {

@@ -6,7 +6,6 @@ import { getPasswordByUsername, getUserByUsername, listUsers } from '../lib/db.j
 import { ensureIsAdmin, generateAccessToken, jwtPassport } from '../lib/jwt-tools.js';
 import { createUser, findById } from '../lib/users.js';
 
-const { TOKEN_SECRET } = process.env;
 export const usersRouter = express.Router();
 
 // Föll fyrir login routerinn
@@ -93,18 +92,23 @@ async function patchMe(req, res) {
 
 async function patchUser(req, res) {
   const { slug } = req.params;
-  const user = req.user
-  const message = "Admin user cannot revoke admin rights."
+  const { } = req.user;
+  const message = "Admin user cannot revoke his own admin rights.";
+
 }
-}
 
-usersRouter.get('/me', jwtPassport.authenticate('jwt', { session: false }), catchErrors(viewMe));
-usersRouter.patch('/me', jwtPassport.authenticate('jwt', { session: false }), catchErrors(patchMe));
+usersRouter.get('/me', jwtPassport.authenticate('jwt', { session: false }),
+  catchErrors(viewMe));
+usersRouter.patch('/me', jwtPassport.authenticate('jwt', { session: false }),
+  catchErrors(patchMe));
 
-usersRouter.get('/:slug', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, catchErrors(viewUser));
-usersRouter.patch('/:slug', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, catchErrors(patchUserAdmin));
+usersRouter.get('/:slug', jwtPassport.authenticate('jwt', { session: false }),
+  ensureIsAdmin, catchErrors(viewUser));
+usersRouter.patch('/:slug', jwtPassport.authenticate('jwt', { session: false }),
+  ensureIsAdmin, catchErrors(patchUserAdmin));
 
-usersRouter.get('/', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, catchErrors(allUsers));
+usersRouter.get('/', jwtPassport.authenticate('jwt', { session: false }),
+  ensureIsAdmin, catchErrors(allUsers));
 
 usersRouter.post('/login', catchErrors(loginRoute));
 

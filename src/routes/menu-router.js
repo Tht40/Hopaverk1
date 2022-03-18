@@ -45,7 +45,7 @@ async function getMenuRoute(req, res) {
     // Fallið sækir eftir category ef category er ekki null
     // Annars sækir fallið alla items.
     const menuItems = await getMenu(page * limit, limit, category, search);
-
+    /* eslint-disable prefer-template */
     let url = req.protocol + '://' + req.get('host') + req.originalUrl + '?';
 
     if (category) {
@@ -343,6 +343,7 @@ async function changeCategory(req, res, next) {
     await updateCategory(id, title);
     res.json({ msg: '200 Updated' });
 }
+/* eslint-enable prefer-template */
 
 // Route fyrir menu router
 const menuItemsValidationChain = [
@@ -404,7 +405,8 @@ const postMenuItemXssClean = [
     body('category')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.post('/', jwtPassport.authenticate('jwt', { session: false }), upload.single('picture'), postMenuItemValidators,
+menuRouter.post('/', jwtPassport.authenticate('jwt', { session: false }),
+    upload.single('picture'), postMenuItemValidators,
     postMenuItemXssClean, catchErrors(postMenuItemRoute))
 
 const menuItemByIdValidationChain = [
@@ -432,8 +434,8 @@ const deleteMenuItemXssClean = [
     param('id')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.delete('/:id', jwtPassport.authenticate('jwt', { session: false }), deleteMenuItemValidation,
-    deleteMenuItemXssClean, catchErrors(deleteMenuItemRoute))
+menuRouter.delete('/:id', jwtPassport.authenticate('jwt', { session: false }),
+    deleteMenuItemValidation, deleteMenuItemXssClean, catchErrors(deleteMenuItemRoute))
 
 const updateMenuItemValidation = [
     param('id')
@@ -473,7 +475,8 @@ const updateMenuItemXssClean = [
     body('category')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.patch('/:id', jwtPassport.authenticate('jwt', { session: false }), updateMenuItemValidation, updateMenuItemXssClean, catchErrors(updateMenuItemRoute));
+menuRouter.patch('/:id', jwtPassport.authenticate('jwt', { session: false }),
+    updateMenuItemValidation, updateMenuItemXssClean, catchErrors(updateMenuItemRoute));
 
 // Route fyrir categories router
 const categoriesValidationChain = [
@@ -490,7 +493,8 @@ const xssCleanCategories = [
         .customSanitizer((value) => xss(value)),
 ];
 
-categoriesRouter.get('/', categoriesValidationChain, xssCleanCategories, catchErrors(getCategoriesRoute));
+categoriesRouter.get('/', categoriesValidationChain, xssCleanCategories,
+    catchErrors(getCategoriesRoute));
 
 const createCategoryValidation = [
     body('title')
@@ -505,7 +509,8 @@ const createCategoryXssClean = [
     body('title')
         .customSanitizer((value) => xss(value)),
 ];
-categoriesRouter.post('/', jwtPassport.authenticate('jwt', { session: false }), createCategoryValidation, createCategoryXssClean, catchErrors(createCategoryRoute));
+categoriesRouter.post('/', jwtPassport.authenticate('jwt', { session: false }),
+    createCategoryValidation, createCategoryXssClean, catchErrors(createCategoryRoute));
 
 const deleteCategoryValidation = [
     param('id')
@@ -518,7 +523,8 @@ const deleteCategoryXssClean = [
         .customSanitizer((value) => xss(value))
 ];
 
-categoriesRouter.delete('/:id', jwtPassport.authenticate('jwt', { session: false }), deleteCategoryValidation, deleteCategoryXssClean, catchErrors(deleteCategoryRoute));
+categoriesRouter.delete('/:id', jwtPassport.authenticate('jwt', { session: false }),
+    deleteCategoryValidation, deleteCategoryXssClean, catchErrors(deleteCategoryRoute));
 
 const changeCategoryValidation = [
     param('id')
@@ -537,4 +543,5 @@ const changeCategoryXssClean = [
     body('title')
         .customSanitizer((value) => xss(value)),
 ];
-categoriesRouter.patch('/:id', jwtPassport.authenticate('jwt', { session: false }), changeCategoryValidation, changeCategoryXssClean, catchErrors(changeCategory))
+categoriesRouter.patch('/:id', jwtPassport.authenticate('jwt', { session: false }),
+    changeCategoryValidation, changeCategoryXssClean, catchErrors(changeCategory))

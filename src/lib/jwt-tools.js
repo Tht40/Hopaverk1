@@ -20,12 +20,10 @@ export function generateAccessToken(user) {
     return jwt.sign(user, TOKEN_SECRET, { expiresIn: '20000s' });
 }
 
-export async function ensureIsAdmin(req, res, next) {
+export function ensureIsAdmin(req, res, next) {
     const { admin } = req.user;
-    if (!admin || admin == '0') {
-        res.json({ message: 'Notandi hefur ekki réttindi' });
+    if (!admin || admin === '0') {
+        return res.json({ message: 'Notandi hefur ekki réttindi' });
     }
-    else {
-        return next();
-    }
+    return next();
 };

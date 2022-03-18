@@ -59,6 +59,7 @@ export async function dropSchema(dropFile = DROP_SCHEMA_FILE) {
 
 export async function getMenu(offset, limit, category, search) {
   if (search) {
+    // eslint-disable-next-line no-param-reassign
     search = `%${search}%`;
   }
 
