@@ -41,12 +41,16 @@ async function getCartidRoute(req, res, next) {
   }
 
   const result = await findLinesInCart(cartid)
+  console.log(result);
   if (!result) {
     next();
     return;
   }
 
-
+  if (result.length === 0) {
+    res.json({ msg: 'The cart is empty' });
+    return;
+  }
 
 
   let totalcost = 0;
@@ -152,12 +156,7 @@ async function getoneLine(req, res, next) {
     image: itemdata.image
   };
 
-
   res.json({ data: line, itemInfo });
-
-
-
-
 
 }
 /*
@@ -184,6 +183,8 @@ cartRouter.post('/:cartid', catchErrors(addItem));
 cartRouter.delete('/:cartid', catchErrors(deleteWholeCart));
 
 cartRouter.get('/:cartid/line/:id', catchErrors(getoneLine));
+
+cartRouter.patch('/:cartid/line/:id', catchErrors());
 /*
 
 cartRouter.delete('/:slug',);
