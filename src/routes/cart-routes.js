@@ -4,9 +4,7 @@ import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
 import {
   addToCart,
-  createCart,
-  findCartById,
-  findLinesInCart,
+  createCart, findLinesInCart,
   getMenuItemById
 } from '../lib/db.js';
 
@@ -54,7 +52,7 @@ async function getCartidRoute(req, res, next) {
 
 
 async function addItem(req, res) {
-  console.log('blabla');
+
   /* const valResulst = validationResult(req); */
   const { cartid } = req.params;
   const { id } = req.body;
@@ -65,12 +63,21 @@ async function addItem(req, res) {
       return;
     }
   */
-  const cart = findCartById(cartid);
-  const menuid = getMenuItemById(id);
-  const result = addToCart(cart, menuid);
+
+  const menuid = await getMenuItemById(id);
+  console.log(menuid.id);
+  /*
+    if (!menuid) {
+      next();
+      return;
+    }
+  */
+  const result = addToCart(cartid, menuid.id);
+
 
 
   res.json({ data: result });
+
 
 }
 /*

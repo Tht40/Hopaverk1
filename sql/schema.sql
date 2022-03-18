@@ -47,14 +47,14 @@ CREATE TABLE public.items
       (64) NOT NULL
 );
 
-    CREATE TABLE public.line
+CREATE TABLE public.line
     (
       cartid uuid,
       id SERIAL,
       total INTEGER,
+
       FOREIGN KEY (cartid) REFERENCES cart(cartid),
       FOREIGN KEY (id) REFERENCES items(id)
 
     );
 
-/*CONSTRAINT event FOREIGN KEY (event) REFERENCES events (id);*/

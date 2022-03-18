@@ -21,6 +21,12 @@ VALUES
     ('Hálf pizza', '1290', 'half pizza', 1, 'https://static.wikia.nocookie.net/2007scape/images/6/64/1-2_meat_pizza_detail.png/revision/latest?cb=20180415232800');
 
 
+INSERT INTO public.cart
+    (cartid)
+VALUES
+    ('f99f5811-2c07-4c6d-8e53-1d17927c3962');
+
+
 INSERT INTO users
     (name, username, password, admin)
 VALUES

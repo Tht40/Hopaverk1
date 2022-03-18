@@ -64,10 +64,10 @@ export async function getMenu(offset, limit, category, search) {
 
   let nrOfArguments = 0;
 
-  let q = `SELECT * FROM public.items`;
+  let q = 'SELECT * FROM public.items';
 
   if (category || search) {
-    q += ` WHERE`;
+    q += ' WHERE';
   }
 
   if (category) {
@@ -451,18 +451,18 @@ export async function findCartById(id) {
     SELECT
       cartid
     FROM
-      cart
+      public.cart
     WHERE
-      cartid.uuid::text = '$1'
+      cartid = $1
   `;
 
   const result = await query(q, [id]);
+  console.log(JSON.stringify(result.rows[0]));
 
-  if (result && result.rowCount === 1) {
-    return result.rows[0];
-  }
+  return result.rows[0];
 
-  return null;
+
+
 }
 
 export async function findLinesInCart(cartid) {
@@ -471,7 +471,7 @@ export async function findLinesInCart(cartid) {
     FROM
       line
     WHERE
-      id = $1
+      id::text = $1
   `;
 
   const result = await query(q, [cartid]);
@@ -487,7 +487,7 @@ export async function addToCart(cartid, itemID) {
     INSERT INTO
       line
     VALUES
-      ($1, $2)
+      ($1, $2, 1)
   `;
 
   const result = await query(q, [cartid, itemID]);
