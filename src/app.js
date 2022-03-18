@@ -9,6 +9,7 @@ import { cartRouter } from './routes/cart-routes.js';
 import { indexRouter } from './routes/index-routes.js';
 import { categoriesRouter, menuRouter } from './routes/menu-router.js';
 import { usersRouter } from './routes/users-routes.js';
+import { websockets } from './websocket-server.js';
 
 
 dotenv.config();
@@ -28,6 +29,7 @@ const app = express();
 
 // Sér um að req.body innihaldi gögn úr formi
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 const path = dirname(fileURLToPath(import.meta.url));
 
@@ -71,6 +73,8 @@ app.use((err, req, res, next) => {
   res.status(500).render('error', { title });
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.info(`Server running at http://localhost:${port}/`);
 });
+
+websockets(server);
