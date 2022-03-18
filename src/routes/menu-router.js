@@ -46,7 +46,7 @@ async function getMenuRoute(req, res) {
     // Annars sækir fallið alla items.
     const menuItems = await getMenu(page * limit, limit, category, search);
     /* eslint-disable prefer-template */
-    let url = req.protocol + '://' + req.get('host') + req.originalUrl + '?';
+    let url = req.protocol + '://' + req.get('host') + '/menu' + '?';
 
     if (category) {
         url += 'category=' + category + '&';

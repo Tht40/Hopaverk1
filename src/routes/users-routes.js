@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import express from 'express';
-import { validationResult } from 'express-validator';
+import { query, validationResult } from 'express-validator';
+import xss from 'xss';
 import { catchErrors } from '../lib/catch-errors.js';
 import { getPasswordByUsername, getUserByUsername, listUsers } from '../lib/db.js';
 import { ensureIsAdmin, generateAccessToken, jwtPassport } from '../lib/jwt-tools.js';
@@ -48,12 +49,42 @@ async function loginRoute(req, res) {
 }
 
 async function allUsers(req, res) {
-  console.log(req.user);
+  const valResults = validationResult(req);
 
-  const users = await listUsers();
+  if (!valResults.isEmpty()) {
+    res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+    return;
+  }
+
+  let { page } = req.query;
+  const limit = 10;
+
+  if (!page) {
+    page = 1;
+  }
+
+  page = page - 1;
+
+  const users = await listUsers(limit * page, limit);
+
+  page = page + 1;
+
+  const url = req.protocol + '://' + req.get('host');
 
   res.json({
-    users
+    msg: '200 OK',
+    data: users,
+    _links: {
+      self: {
+        href: url + '/users?page=' + page,
+      },
+      previous: {
+        href: url + '/users?page=' + (page == 1 ? page : page - 1),
+      },
+      next: {
+        href: url + '/users?page=' + (page + 1),
+      }
+    }
   });
 }
 
@@ -107,8 +138,18 @@ usersRouter.get('/:slug', jwtPassport.authenticate('jwt', { session: false }),
 usersRouter.patch('/:slug', jwtPassport.authenticate('jwt', { session: false }),
   ensureIsAdmin, catchErrors(patchUser));
 
+const getAllUsersValidation = [
+  query('page')
+    .optional()
+    .isInt()
+    .withMessage('Page must be an integer'),
+];
+const getAllUsersXssClean = [
+  query('page')
+    .customSanitizer((value) => xss(value))
+];
 usersRouter.get('/', jwtPassport.authenticate('jwt', { session: false }),
-  ensureIsAdmin, catchErrors(allUsers));
+  ensureIsAdmin, getAllUsersValidation, getAllUsersXssClean, catchErrors(allUsers));
 
 usersRouter.post('/login', catchErrors(loginRoute));
 

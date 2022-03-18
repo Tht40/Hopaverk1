@@ -579,15 +579,16 @@ export async function listEvents() {
   return null;
 }
 
-export async function listUsers() {
+export async function listUsers(offset = 0, limit = 10) {
   const q = `
     SELECT
      name, username, id, admin
     FROM
       users
+      LIMIT $1 OFFSET $2
   `;
 
-  const result = await query(q);
+  const result = await query(q, [limit, offset]);
 
   if (result) {
     return result.rows;
