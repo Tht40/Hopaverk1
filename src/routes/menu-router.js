@@ -252,6 +252,10 @@ async function getCategoriesRoute(req, res) {
     });
 }
 
+async function createCategoryRoute(req, res) {
+
+}
+
 // Route fyrir menu router
 const menuItemsValidationChain = [
     query('page')
@@ -396,3 +400,16 @@ const xssCleanCategories = [
 ];
 
 categoriesRouter.get('/', categoriesValidationChain, xssCleanCategories, catchErrors(getCategoriesRoute));
+
+const createCategoryValidation = [
+    body('title')
+        .trim()
+        .escape()
+        .isLength({ max: 64 })
+        .withMessage('title cannot be longer than 64 letter'),
+];
+const createCategoryXssClean = [
+    body('title')
+        .customSanitizer((value) => xss(value)),
+];
+categoriesRouter.post('/', createCategoryValidation, createCategoryXssClean, catchErrors(createCategoryRoute));
