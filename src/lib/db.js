@@ -563,7 +563,7 @@ export async function listEvents() {
 export async function listUsers() {
   const q = `
     SELECT
-     name, username, id
+     name, username, id, admin
     FROM
       users
   `;
