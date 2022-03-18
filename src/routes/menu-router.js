@@ -15,6 +15,7 @@ import {
     getMenuItemsByCategory,
     insertCategory,
     insertMenuItem,
+    updateCategory,
     updateMenuItem
 } from '../lib/db.js';
 
@@ -275,6 +276,7 @@ async function createCategoryRoute(req, res) {
 
     if (checkIfExists) {
         res.status(400).json({ msg: '400 Bad request category with the same title already exists' });
+        return;
     }
 
     const results = await insertCategory(title);
@@ -315,6 +317,38 @@ async function deleteCategoryRoute(req, res, next) {
     await deleteCategory(id);
 
     res.json({ msg: '200 deleted' });
+}
+
+async function changeCategory(req, res, next) {
+    // TODO: Tékka hvort að notandi sé skráður inn.
+    const valResults = validationResult(req);
+
+    if (!valResults.isEmpty()) {
+        res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+        return;
+    }
+
+    const { id } = req.params;
+    const { title } = req.body;
+
+    const category = await getCategoryById(id);
+    const categoryByTitle = await getCategoryByTitle(title);
+
+    if (!category) {
+        next();
+        return;
+    }
+
+    if (categoryByTitle && categoryByTitle.id != id) {
+        res.status(400).json({
+            msg: '400 Bad request',
+            data: [{ msg: 'Another category with the same title already exists' }]
+        });
+        return;
+    }
+
+    await updateCategory(id, title);
+    res.json({ msg: '200 Updated' });
 }
 
 // Route fyrir menu router
@@ -483,7 +517,7 @@ categoriesRouter.post('/', createCategoryValidation, createCategoryXssClean, cat
 const deleteCategoryValidation = [
     param('id')
         .isInt()
-        .withMessage('id verður að vera tala')
+        .withMessage('id must be an integer')
         .toInt()
 ];
 const deleteCategoryXssClean = [
@@ -492,3 +526,22 @@ const deleteCategoryXssClean = [
 ];
 
 categoriesRouter.delete('/:id', deleteCategoryValidation, deleteCategoryXssClean, catchErrors(deleteCategoryRoute));
+
+const changeCategoryValidation = [
+    param('id')
+        .isInt()
+        .withMessage('id must be an integer')
+        .toInt(),
+    body('title')
+        .trim()
+        .escape()
+        .isLength({ min: 1 })
+        .withMessage('title cannot be empty'),
+];
+const changeCategoryXssClean = [
+    param('id')
+        .customSanitizer((value) => xss(value)),
+    body('title')
+        .customSanitizer((value) => xss(value)),
+];
+categoriesRouter.patch('/:id', changeCategoryValidation, changeCategoryXssClean, catchErrors(changeCategory))

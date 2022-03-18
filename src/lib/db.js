@@ -264,6 +264,14 @@ export async function updateMenuItem(id, title, price, description, category) {
   await query(q, params);
 }
 
+export async function updateCategory(id, title) {
+  const q = `
+    UPDATE public.categories SET title=$1 WHERE id=$2
+  `;
+
+  await query(q, [title, id]);
+}
+
 export async function insertMenuItem(title, description, category, price, url = 'Not uploaded') {
   const q = `
     INSERT INTO public.items (title, price, description, category, image)
