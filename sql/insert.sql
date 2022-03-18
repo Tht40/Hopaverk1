@@ -26,9 +26,10 @@ INSERT INTO public.cart
 VALUES
     ('f99f5811-2c07-4c6d-8e53-1d17927c3962');
 INSERT INTO public.order
-    (orderid)
+    (orderid, name)
 VALUES
-    ('f4fe8717-9db3-467d-a12f-b5b8de909531');
+    ('f4fe8717-9db3-467d-a12f-b5b8de909531','pöntun1');
+
 
 
 INSERT INTO users

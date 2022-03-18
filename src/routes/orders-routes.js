@@ -1,8 +1,8 @@
 import express from 'express';
 import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
-import { findOrderById, createOrder } from '../lib/db.js';
-import { ensureIsAdmin } from '../lib/jwt-tools.js';
+import { createOrder, findOrderById } from '../lib/db.js';
+import { ensureIsAdmin, jwtPassport } from '../lib/jwt-tools.js';
 
 export const ordersRouter = express.Router();
 
@@ -17,6 +17,7 @@ async function allOrders(req, res) {
 
 async function newOrder(req, res, next) {
   const valResults = validationResult(req);
+  const { name } = req.body;
 
 
   if (!valResults.isEmpty()) {
@@ -24,14 +25,13 @@ async function newOrder(req, res, next) {
     return
   }
 
-  const newOrder = await createOrder()
-
-  if (!newOrder) {
+  const Order = await createOrder(name)
+  if (!Order) {
     next();
     return;
   }
 
-  res.json({ data: newOrder });
+  res.json({ data: Order });
 }
 
 async function viewOrder(req, res) {
