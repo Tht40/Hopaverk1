@@ -298,6 +298,16 @@ export async function updateCategory(id, title) {
   await query(q, [title, id]);
 }
 
+export async function updateCartLine(total, cartid) {
+  const q = `
+  UPDATE public.line SET total=$1 WHERE cartid=$2
+`;
+
+  await query(q, [total, cartid]);
+}
+
+
+
 export async function insertMenuItem(title, description, category, price, url = 'Not uploaded') {
   const q = `
     INSERT INTO public.items (title, price, description, category, image)

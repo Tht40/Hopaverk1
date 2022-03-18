@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
 import {
   addToCart,
-  createCart, deleteCart, findCartById, findLinesInCart, getLineInCart, getMenuItemById
+  createCart, deleteCart, findCartById, findLinesInCart, getLineInCart, getMenuItemById, updateCartLine
 } from '../lib/db.js';
 
 
@@ -159,6 +159,37 @@ async function getoneLine(req, res, next) {
   res.json({ data: line, itemInfo });
 
 }
+
+async function patchCartLine(req, res, next) {
+  const valResults = validationResult(req);
+
+  if (!valResults.isEmpty()) {
+    res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+    return;
+  }
+
+  const { total } = req.body;
+  const { cartid, id } = req.params;
+  console.log(cartid);
+  console.log(id);
+  console.log(total);
+  const line = await getLineInCart(cartid, id);
+
+  if (!line) {
+    res.json({ msg: 'no line found' });
+  }
+
+  const updatedline = await updateCartLine(total, cartid);
+
+  res.json({ data: updatedline, msg: 'total updated' })
+
+
+
+
+
+
+
+}
 /*
 
 async function eventRoute(req, res, next) {
@@ -184,7 +215,7 @@ cartRouter.delete('/:cartid', catchErrors(deleteWholeCart));
 
 cartRouter.get('/:cartid/line/:id', catchErrors(getoneLine));
 
-cartRouter.patch('/:cartid/line/:id', catchErrors());
+cartRouter.patch('/:cartid/line/:id', catchErrors(patchCartLine));
 /*
 
 cartRouter.delete('/:slug',);
