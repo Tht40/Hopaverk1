@@ -34,8 +34,6 @@ app.use(express.json());
 const path = dirname(fileURLToPath(import.meta.url));
 
 app.use(express.static(join(path, '../public')));
-app.set('views', join(path, '../views'));
-app.set('view engine', 'ejs');
 
 app.use(
   session({
@@ -59,12 +57,10 @@ app.use('/cart', cartRouter);
 app.use('/orders', ordersRouter);
 app.use('/', indexRouter);
 
-
 /** Middleware sem sér um 404 villur. */
 app.use((req, res) => {
   res.status(404).json({ msg: '404 Not found' });
 });
-
 
 /** Middleware sem sér um villumeðhöndlun. */
 // eslint-disable-next-line no-unused-vars
