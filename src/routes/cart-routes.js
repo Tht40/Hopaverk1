@@ -25,7 +25,6 @@ async function postCartRoute(req, res, next) {
   const newCart = await createCart()
 
   if (!newCart) {
-    console.log('hehe');
     next();
     return;
   }
