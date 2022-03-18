@@ -103,7 +103,7 @@ export async function getMenu(offset, limit, category, search) {
 
 export async function getMenuItemById(id) {
   const q = `
-    SELECT * FROM public.items WHERE id = $1;
+    SELECT * FROM public.items WHERE itemid = $1;
   `;
 
   const results = await query(q, [id]);
@@ -487,13 +487,32 @@ export async function findLinesInCart(cartid) {
 
   return null;
 }
+
+export async function getLineInCart(cartid, lineid) {
+  const q = `
+    SELECT *
+    FROM
+      line
+    WHERE
+      cartid = $1 AND id = $2;
+  `;
+
+  const result = await query(q, [cartid, lineid]);
+  if (result) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+
+
 export async function addToCart(cartid, itemID, numberOfItems) {
   const q = `
     INSERT INTO line
-      (cartid, id, total)
+      (cartid, itemid, total)
     VALUES
       ($1, $2, $3)
-    RETURNING cartid, id, total;
+    RETURNING cartid, itemid, total;
   `;
 
   const result = await query(q, [cartid, itemID, numberOfItems]);
