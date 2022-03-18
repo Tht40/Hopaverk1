@@ -332,7 +332,7 @@ async function changeCategory(req, res, next) {
     return;
   }
 
-  if (categoryByTitle && categoryByTitle.id != id) {
+  if (categoryByTitle && categoryByTitle.id !== id) {
     res.status(400).json({
       msg: '400 Bad request',
       data: [{ msg: 'Another category with the same title already exists' }]
