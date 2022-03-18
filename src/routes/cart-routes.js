@@ -4,8 +4,7 @@ import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
 import {
   addToCart,
-  createCart, deleteCart, findCartById, findLinesInCart,
-  getMenuItemById
+  createCart, deleteCart, findCartById, findLinesInCart, getMenuItemById
 } from '../lib/db.js';
 
 
@@ -34,12 +33,14 @@ async function getCartidRoute(req, res, next) {
   const valResults = validationResult(req);
   const { cartid } = req.params;
 
+
   if (!valResults.isEmpty()) {
     next();
     return;
   }
 
-  const result = findLinesInCart(cartid)
+  const result = await findLinesInCart(cartid)
+  console.log(result);
 
   if (!result) {
     next();
@@ -125,6 +126,8 @@ cartRouter.get('/:cartid', catchErrors(getCartidRoute));
 cartRouter.post('/:cartid', catchErrors(addItem));
 
 cartRouter.delete('/:cartid', catchErrors(deleteWholeCart));
+
+cartRouter.get('/:cartid/line/:id', catchErrors());
 /*
 
 cartRouter.delete('/:slug',);

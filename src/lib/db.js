@@ -476,7 +476,7 @@ export async function findLinesInCart(cartid) {
     FROM
       line
     WHERE
-      id::text = $1;
+      cartid = $1;
   `;
 
   const result = await query(q, [cartid]);
