@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
 import {
   addToCart,
-  createCart, findLinesInCart,
+  createCart, findCartById, findLinesInCart,
   getMenuItemById
 } from '../lib/db.js';
 
@@ -51,33 +51,53 @@ async function getCartidRoute(req, res, next) {
 }
 
 
-async function addItem(req, res) {
+async function addItem(req, res, next) {
 
-  /* const valResulst = validationResult(req); */
+  const valResulst = validationResult(req);
   const { cartid } = req.params;
-  const { id } = req.body;
+  const { id, num } = req.body;
 
-  /*
-    if (!valResulst.isEmpty()) {
-      next();
-      return;
-    }
-  */
+
+  if (!valResulst.isEmpty()) {
+    next();
+    return;
+  }
+
 
   const menuid = await getMenuItemById(id);
-  console.log(menuid.id);
-  /*
-    if (!menuid) {
-      next();
-      return;
-    }
-  */
-  const result = addToCart(cartid, menuid.id);
 
 
+  if (!menuid) {
+    next();
+    return;
+  }
+
+  const result = await addToCart(cartid, menuid.id, num);
 
   res.json({ data: result });
 
+
+}
+
+async function deleteCart(req, res, next) {
+  // TODO: Tékka hvort notandi sé loggaður inn
+  const valResults = validationResult(req);
+  const { id } = req.params;
+
+  if (!valResults.isEmpty()) {
+    res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+    return;
+  }
+  const cart = await findCartById(id)
+
+  if (!cart) {
+    next();
+    return;
+  }
+
+  await deleteCart(id);
+
+  res.json({ msg: '200 deleted' });
 
 }
 /*
@@ -100,6 +120,8 @@ cartRouter.post('/', catchErrors(postCartRoute));
 cartRouter.get('/:cartid', catchErrors(getCartidRoute));
 
 cartRouter.post('/:cartid', catchErrors(addItem));
+
+cartRouter.delete('/:cartid', catchErrors(deleteCart));
 /*
 
 cartRouter.delete('/:slug',);

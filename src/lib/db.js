@@ -337,6 +337,14 @@ export async function deleteCategory(id) {
   await query(q, [id]);
 }
 
+export async function deleteCart(id) {
+  const q = `
+    DELETE FROM public.cart WHERE cartid = $1
+  `;
+
+  await query(q, [id]);
+}
+
 // Updatear ekki description, erum ekki að útfæra partial update
 export async function updateEvent(id, { name, slug, description } = {}) {
   const q = `
@@ -448,12 +456,7 @@ export async function findOrderById(id) {
 
 export async function findCartById(id) {
   const q = `
-    SELECT
-      cartid
-    FROM
-      public.cart
-    WHERE
-      cartid = $1
+    SELECT * FROM public.cart WHERE cartid = $1;
   `;
 
   const result = await query(q, [id]);
@@ -471,7 +474,7 @@ export async function findLinesInCart(cartid) {
     FROM
       line
     WHERE
-      id::text = $1
+      id::text = $1;
   `;
 
   const result = await query(q, [cartid]);
@@ -482,17 +485,19 @@ export async function findLinesInCart(cartid) {
 
   return null;
 }
-export async function addToCart(cartid, itemID) {
+export async function addToCart(cartid, itemID, numberOfItems) {
   const q = `
-    INSERT INTO
-      line
+    INSERT INTO line
+      (cartid, id, total)
     VALUES
-      ($1, $2, 1)
+      ($1, $2, $3)
+    RETURNING cartid, id, total;
   `;
 
-  const result = await query(q, [cartid, itemID]);
+  const result = await query(q, [cartid, itemID, numberOfItems]);
 
   if (result && result.rowCount === 1) {
+    console.log(result);
     return result.rows[0];
   }
 
