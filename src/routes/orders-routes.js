@@ -1,6 +1,7 @@
 import express from 'express';
 import { catchErrors } from '../lib/catch-errors.js';
 import { findOrderById } from '../lib/db.js';
+import { ensureIsAdmin } from '../lib/jwt-tools.js';
 
 export const ordersRouter = express.Router();
 
@@ -26,6 +27,7 @@ async function viewOrder(req, res) {
     });
 }
 
+
 async function viewOrderHistory(req, res) {
     const { slug } = req.params;
     const order = await findOrderById(slug);
@@ -40,9 +42,18 @@ async function viewOrderHistory(req, res) {
 }
 
 
+async function updateOrder(req, res) {
+}
+
+async function newOrder(req, res) {
+}
+
 
 ordersRouter.get('/:slug', catchErrors(viewOrder));
 
-ordersRouter.post('/:slug/status', catchErrors(viewOrderHistory));
+ordersRouter.get('/:slug/status', catchErrors(viewOrderHistory));
+ordersRouter.post('/:slug/status', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, catchErrors(updateOrder));
 
-ordersRouter.get('/', catchErrors(allOrders));
+
+ordersRouter.get('/', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, catchErrors(allOrders));
+ordersRouter.post('/', catchErrors(newOrder));
