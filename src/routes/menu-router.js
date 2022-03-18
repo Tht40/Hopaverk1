@@ -31,7 +31,7 @@ async function getMenuRoute(req, res) {
         page = 1;
     }
 
-    page = page - 1;
+    page -= -1;
 
     // Fallið sækir eftir category ef category er ekki null
     // Annars sækir fallið alla items.
@@ -45,7 +45,7 @@ async function getMenuRoute(req, res) {
     if (search) {
         url += 'search=' + search + '&';
     }
-    page = page + 1;
+    page += 1;
 
     res.json({
         data: menuItems,
@@ -96,7 +96,7 @@ async function postMenuItemRoute(req, res) {
             param: 'picture',
             location: 'body',
         });
-    } else if (req.file.mimetype != 'image/png' && req.file.mimetype != 'image/jpeg') {
+    } else if (req.file.mimetype !== 'image/png' && req.file.mimetype !== 'image/jpeg') {
         otherError = true;
         errors.push({
             value: '',
@@ -184,7 +184,7 @@ async function updateMenuItemRoute(req, res, next) {
 
     const item2 = await getMenuItemByTitle(title);
 
-    if (item2 && item2.id != id) {
+    if (item2 && item2.id !== id) {
         res.status(400).json({
             msg: '400 Bad request', data: [{
                 msg: 'Menu item with same title already exists',
@@ -230,11 +230,11 @@ async function getCategoriesRoute(req, res) {
         page = 1;
     }
 
-    page = page - 1;
+    page -= 1;
 
     const results = await getCategoriesPage(limit * page, limit);
 
-    page = page + 1;
+    page += 1;
     const nextPage = page + 1;
 
     const url = req.protocol + '://' + req.get('host');
@@ -312,7 +312,8 @@ const postMenuItemXssClean = [
     body('category')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.post('/', upload.single('picture'), postMenuItemValidators, postMenuItemXssClean, catchErrors(postMenuItemRoute))
+menuRouter.post('/', upload.single('picture'), postMenuItemValidators,
+    postMenuItemXssClean, catchErrors(postMenuItemRoute))
 
 const menuItemByIdValidationChain = [
     param('id')
@@ -326,7 +327,8 @@ const menuItemByIdXssClean = [
     param('id')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.get('/:id', menuItemByIdValidationChain, menuItemByIdXssClean, catchErrors(getMenuByIdRoute));
+menuRouter.get('/:id', menuItemByIdValidationChain,
+    menuItemByIdXssClean, catchErrors(getMenuByIdRoute));
 
 const deleteMenuItemValidation = [
     param('id')
@@ -338,7 +340,8 @@ const deleteMenuItemXssClean = [
     param('id')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.delete('/:id', deleteMenuItemValidation, deleteMenuItemXssClean, catchErrors(deleteMenuItemRoute))
+menuRouter.delete('/:id', deleteMenuItemValidation,
+    deleteMenuItemXssClean, catchErrors(deleteMenuItemRoute))
 
 const updateMenuItemValidation = [
     param('id')

@@ -17,7 +17,7 @@ async function viewOrder(req, res) {
     const { slug } = req.params;
     const order = await findOrderById(slug);
 
-    if (!user) {
+    if (!order) {
         res.JSON({ message: 'Engin pöntun fannst.' });
     }
 
@@ -30,7 +30,7 @@ async function viewOrderHistory(req, res) {
     const { slug } = req.params;
     const order = await findOrderById(slug);
 
-    if (!user) {
+    if (!order) {
         res.JSON({ message: 'Engin pöntun fannst.' });
     }
 
@@ -41,8 +41,8 @@ async function viewOrderHistory(req, res) {
 
 
 
-usersRouter.get('/:slug', ensureLoggedIn, catchErrors(viewOrder));
+ordersRouter.get('/:slug', catchErrors(viewOrder));
 
-usersRouter.post('/:slug/status', ensureLoggedIn, catchErrors(viewOrderHistory));
+ordersRouter.post('/:slug/status', catchErrors(viewOrderHistory));
 
-usersRouter.get('/', ensureLoggedIn, catchErrors(allOrders));
+ordersRouter.get('/', catchErrors(allOrders));
