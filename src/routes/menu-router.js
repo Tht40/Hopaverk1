@@ -18,6 +18,7 @@ import {
     updateCategory,
     updateMenuItem
 } from '../lib/db.js';
+import { jwtPassport } from '../lib/jwt-tools.js';
 
 export const menuRouter = express.Router();
 export const categoriesRouter = express.Router();
@@ -91,7 +92,6 @@ async function getMenuByIdRoute(req, res, next) {
 }
 
 async function postMenuItemRoute(req, res) {
-    // TODO: Tékka hvort að notandi sé loggaður inn
     const valResults = validationResult(req);
     let otherError = false;
     let errors = valResults.errors;
@@ -143,8 +143,6 @@ async function postMenuItemRoute(req, res) {
 }
 
 async function deleteMenuItemRoute(req, res, next) {
-    //TODO: passa að notandi þarf að vera loggaður inn til þess að gera þetta
-
     const valResults = validationResult(req);
     const { id } = req.params;
 
@@ -166,7 +164,6 @@ async function deleteMenuItemRoute(req, res, next) {
 }
 
 async function updateMenuItemRoute(req, res, next) {
-    // TODO: tékka hvort að notandi sé skráður inn.
     const valResults = validationResult(req);
 
     if (!valResults.isEmpty()) {
@@ -261,8 +258,6 @@ async function getCategoriesRoute(req, res) {
 }
 
 async function createCategoryRoute(req, res) {
-    // TODO: Tékka hvort notandi sé loggaður inn
-
     const valResults = validationResult(req);
 
     if (!valResults.isEmpty()) {
@@ -285,7 +280,6 @@ async function createCategoryRoute(req, res) {
 }
 
 async function deleteCategoryRoute(req, res, next) {
-    // TODO: Tékka hvort notandi sé loggaður inn
     const valResults = validationResult(req);
     const { id } = req.params;
 
@@ -320,7 +314,6 @@ async function deleteCategoryRoute(req, res, next) {
 }
 
 async function changeCategory(req, res, next) {
-    // TODO: Tékka hvort að notandi sé skráður inn.
     const valResults = validationResult(req);
 
     if (!valResults.isEmpty()) {
@@ -411,7 +404,7 @@ const postMenuItemXssClean = [
     body('category')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.post('/', upload.single('picture'), postMenuItemValidators,
+menuRouter.post('/', jwtPassport.authenticate('jwt', { session: false }), upload.single('picture'), postMenuItemValidators,
     postMenuItemXssClean, catchErrors(postMenuItemRoute))
 
 const menuItemByIdValidationChain = [
@@ -439,7 +432,7 @@ const deleteMenuItemXssClean = [
     param('id')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.delete('/:id', deleteMenuItemValidation,
+menuRouter.delete('/:id', jwtPassport.authenticate('jwt', { session: false }), deleteMenuItemValidation,
     deleteMenuItemXssClean, catchErrors(deleteMenuItemRoute))
 
 const updateMenuItemValidation = [
@@ -480,7 +473,7 @@ const updateMenuItemXssClean = [
     body('category')
         .customSanitizer((value) => xss(value)),
 ];
-menuRouter.patch('/:id', updateMenuItemValidation, updateMenuItemXssClean, catchErrors(updateMenuItemRoute));
+menuRouter.patch('/:id', jwtPassport.authenticate('jwt', { session: false }), updateMenuItemValidation, updateMenuItemXssClean, catchErrors(updateMenuItemRoute));
 
 // Route fyrir categories router
 const categoriesValidationChain = [
@@ -512,7 +505,7 @@ const createCategoryXssClean = [
     body('title')
         .customSanitizer((value) => xss(value)),
 ];
-categoriesRouter.post('/', createCategoryValidation, createCategoryXssClean, catchErrors(createCategoryRoute));
+categoriesRouter.post('/', jwtPassport.authenticate('jwt', { session: false }), createCategoryValidation, createCategoryXssClean, catchErrors(createCategoryRoute));
 
 const deleteCategoryValidation = [
     param('id')
@@ -525,7 +518,7 @@ const deleteCategoryXssClean = [
         .customSanitizer((value) => xss(value))
 ];
 
-categoriesRouter.delete('/:id', deleteCategoryValidation, deleteCategoryXssClean, catchErrors(deleteCategoryRoute));
+categoriesRouter.delete('/:id', jwtPassport.authenticate('jwt', { session: false }), deleteCategoryValidation, deleteCategoryXssClean, catchErrors(deleteCategoryRoute));
 
 const changeCategoryValidation = [
     param('id')
@@ -544,4 +537,4 @@ const changeCategoryXssClean = [
     body('title')
         .customSanitizer((value) => xss(value)),
 ];
-categoriesRouter.patch('/:id', changeCategoryValidation, changeCategoryXssClean, catchErrors(changeCategory))
+categoriesRouter.patch('/:id', jwtPassport.authenticate('jwt', { session: false }), changeCategoryValidation, changeCategoryXssClean, catchErrors(changeCategory))

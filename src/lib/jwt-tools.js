@@ -18,7 +18,7 @@ passport.use(new JWTStrategy(jwtOptions, (jwtPayload, done) => {
 }));
 
 export function generateAccessToken(user) {
-    return jwt.sign(user, TOKEN_SECRET, { expiresIn: '8000s' });
+    return jwt.sign(user, TOKEN_SECRET, { expiresIn: '20000s' });
 }
 
 export async function ensureIsAdmin(req, res, next) {
