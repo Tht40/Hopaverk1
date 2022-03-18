@@ -102,6 +102,7 @@ usersRouter.post('/register', (req, res) => {
     const token = generateAccessToken(userToSend);
 
     res.json({ token });
+    return;
   }
 
   const message = 'Notandi er nú þegar til.';
