@@ -35,7 +35,6 @@ async function getMenuRoute(req, res) {
         res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
         return;
     }
-
     if (!page) {
         page = 1;
     }
@@ -94,7 +93,7 @@ async function getMenuByIdRoute(req, res, next) {
 async function postMenuItemRoute(req, res) {
     const valResults = validationResult(req);
     let otherError = false;
-    let errors = valResults.errors;
+    const { errors } = valResults;
 
     if (!req.file) {
         otherError = true;

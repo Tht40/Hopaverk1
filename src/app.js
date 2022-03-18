@@ -6,7 +6,6 @@ import { fileURLToPath } from 'url';
 import { jwtPassport } from './lib/jwt-tools.js';
 import { isInvalid } from './lib/template-helpers.js';
 import { cartRouter } from './routes/cart-routes.js';
-import { indexRouter } from './routes/index-routes.js';
 import { categoriesRouter, menuRouter } from './routes/menu-router.js';
 import { ordersRouter } from './routes/orders-routes.js';
 import { usersRouter } from './routes/users-routes.js';
@@ -34,8 +33,6 @@ app.use(express.json());
 const path = dirname(fileURLToPath(import.meta.url));
 
 app.use(express.static(join(path, '../public')));
-app.set('views', join(path, '../views'));
-app.set('view engine', 'ejs');
 
 app.use(
   session({
@@ -57,14 +54,12 @@ app.use('/menu', menuRouter);
 app.use('/categories', categoriesRouter);
 app.use('/cart', cartRouter);
 app.use('/orders', ordersRouter);
-app.use('/', indexRouter);
-
+//app.use('/', indexRouter);
 
 /** Middleware sem sér um 404 villur. */
 app.use((req, res) => {
   res.status(404).json({ msg: '404 Not found' });
 });
-
 
 /** Middleware sem sér um villumeðhöndlun. */
 // eslint-disable-next-line no-unused-vars
