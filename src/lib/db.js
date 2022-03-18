@@ -196,7 +196,7 @@ export async function getPasswordByUsername(username) {
 
 export async function getUserByUsername(username) {
   const q = `
-  SELECT id, name, username FROM public.users WHERE username=$1
+  SELECT id, name, username, admin FROM public.users WHERE username=$1
 `;
 
   const results = await query(q, [username]);
