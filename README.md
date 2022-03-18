@@ -4,6 +4,7 @@
 |   Nafn    |  HÍ-mail |    github username |
 |-----------|:---------|-------------------:|
 Steinar Logi Geirsson | slg24@hi.is | steinarlogi |
+Þórir Þórðarson | tht40@hi.is | Tht40 |
 Rögnvaldur Pétur Bjarnason | rpb2@hi.is | RoggoDude |
 
 # Keyra vefþjónustuna
