@@ -4,7 +4,7 @@ import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
 import {
   addToCart,
-  createCart, findCartById, findLinesInCart,
+  createCart, deleteCart, findCartById, findLinesInCart,
   getMenuItemById
 } from '../lib/db.js';
 
@@ -79,25 +79,28 @@ async function addItem(req, res, next) {
 
 }
 
-async function deleteCart(req, res, next) {
+async function deleteWholeCart(req, res, next) {
   // TODO: Tékka hvort notandi sé loggaður inn
   const valResults = validationResult(req);
-  const { id } = req.params;
+  const { cartid } = req.params;
 
   if (!valResults.isEmpty()) {
     res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
     return;
   }
-  const cart = await findCartById(id)
+  const cart = await findCartById(cartid)
+
+  console.log(cart);
 
   if (!cart) {
+    res.json({ msg: 'no cart with that id exists' });
     next();
     return;
   }
+  const tempcartid = cart.cartid;
+  await deleteCart(cart);
 
-  await deleteCart(id);
-
-  res.json({ msg: '200 deleted' });
+  res.json({ msg: '200 deleted cart with id: ', data: tempcartid });
 
 }
 /*
@@ -121,7 +124,7 @@ cartRouter.get('/:cartid', catchErrors(getCartidRoute));
 
 cartRouter.post('/:cartid', catchErrors(addItem));
 
-cartRouter.delete('/:cartid', catchErrors(deleteCart));
+cartRouter.delete('/:cartid', catchErrors(deleteWholeCart));
 /*
 
 cartRouter.delete('/:slug',);

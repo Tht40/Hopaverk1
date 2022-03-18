@@ -339,7 +339,7 @@ export async function deleteCategory(id) {
 
 export async function deleteCart(id) {
   const q = `
-    DELETE FROM public.cart WHERE cartid = $1
+    DELETE FROM public.cart WHERE cartid = $1;
   `;
 
   await query(q, [id]);
@@ -456,15 +456,17 @@ export async function findOrderById(id) {
 
 export async function findCartById(id) {
   const q = `
-    SELECT * FROM public.cart WHERE cartid = $1;
+    SELECT * FROM cart WHERE cartid = $1;
   `;
 
   const result = await query(q, [id]);
-  console.log(JSON.stringify(result.rows[0]));
+
+  if (result.rows.length === 0) {
+
+    return null;
+  }
 
   return result.rows[0];
-
-
 
 }
 
@@ -497,7 +499,6 @@ export async function addToCart(cartid, itemID, numberOfItems) {
   const result = await query(q, [cartid, itemID, numberOfItems]);
 
   if (result && result.rowCount === 1) {
-    console.log(result);
     return result.rows[0];
   }
 
