@@ -139,6 +139,34 @@ export async function getCategoriesPage(offset, limit) {
   return results.rows;
 }
 
+export async function getCategoryByTitle(title) {
+  const q = `
+    SELECT * FROM public.categories WHERE title=$1
+  `;
+
+  const results = await query(q, [title]);
+
+  if (results.rows.length === 0) {
+    return null;
+  }
+
+  return results.rows[0];
+}
+
+export async function getCategoryById(id) {
+  const q = `
+    SELECT * FROM public.categories WHERE id=$1
+  `;
+
+  const results = await query(q, [id]);
+
+  if (results.rows.length === 0) {
+    return null;
+  }
+
+  return results.rows[0];
+}
+
 
 export async function createCart() {
   const q = `
@@ -235,9 +263,27 @@ export async function insertMenuItem(title, description, category, price, url = 
   return id;
 }
 
+export async function insertCategory(title) {
+  const q = `
+    INSERT INTO public.categories (title) VALUES ($1) RETURNING *
+  `;
+
+  const results = await query(q, [title]);
+
+  return results.rows[0];
+}
+
 export async function deleteMenuItem(id) {
   const q = `
     DELETE FROM public.items WHERE id=$1
+  `;
+
+  await query(q, [id]);
+}
+
+export async function deleteCategory(id) {
+  const q = `
+    DELETE FROM public.categories WHERE id = $1
   `;
 
   await query(q, [id]);

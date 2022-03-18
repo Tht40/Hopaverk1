@@ -55,6 +55,7 @@ async function getCartidRoute(req, res, next) {
 
 
 async function addItem(req, res) {
+  console.log('blabla');
   /* const valResulst = validationResult(req); */
   const { cartid } = req.params;
   const { id } = req.body;
@@ -92,7 +93,7 @@ cartRouter.post('/', catchErrors(postCartRoute));
 
 cartRouter.get('/:cartid', catchErrors(getCartidRoute));
 
-cartRouter.post('/:cartid,', catchErrors(addItem));
+cartRouter.post('/:cartid', catchErrors(addItem));
 /*
 
 cartRouter.delete('/:slug',);

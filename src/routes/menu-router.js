@@ -5,10 +5,17 @@ import xss from 'xss';
 import { catchErrors } from '../lib/catch-errors.js';
 import { uploadFileBuffer } from '../lib/cloudinary.js';
 import {
+    deleteCategory,
     deleteMenuItem,
     getCategoriesPage,
+    getCategoryById,
+    getCategoryByTitle,
     getMenu,
-    getMenuItemById, getMenuItemByTitle, insertMenuItem, updateMenuItem
+    getMenuItemById,
+    getMenuItemByTitle,
+    insertCategory,
+    insertMenuItem,
+    updateMenuItem
 } from '../lib/db.js';
 
 export const menuRouter = express.Router();
@@ -253,7 +260,52 @@ async function getCategoriesRoute(req, res) {
 }
 
 async function createCategoryRoute(req, res) {
+    // TODO: Tékka hvort notandi sé loggaður inn
 
+    const valResults = validationResult(req);
+
+    if (!valResults.isEmpty()) {
+        res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+        return;
+    }
+
+    const { title } = req.body;
+
+    const checkIfExists = await getCategoryByTitle(title);
+
+    if (checkIfExists) {
+        res.status(400).json({ msg: '400 Bad request category with the same title already exists' });
+    }
+
+    const results = await insertCategory(title);
+
+    res.json({ msg: '200 Created', data: [results] });
+}
+
+async function deleteCategoryRoute(req, res) {
+    // TODO: Tékka hvort notandi sé loggaður inn
+    const valResults = validationResult(req);
+    const { id } = req.params;
+
+    if (!valResults.isEmpty()) {
+        res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+        return;
+    }
+
+    console.log(id);
+
+    const checkIfExists = await getCategoryById(id);
+
+    if (!checkIfExists) {
+        next();
+        return;
+    }
+
+    //TODO: Tékka hvort að það séu einhver items aðnota þetta ctegory
+
+    await deleteCategory(id);
+
+    res.json({ msg: '200 deleted' });
 }
 
 // Route fyrir menu router
@@ -409,10 +461,25 @@ const createCategoryValidation = [
         .trim()
         .escape()
         .isLength({ max: 64 })
-        .withMessage('title cannot be longer than 64 letter'),
+        .withMessage('title cannot be longer than 64 letter')
+        .isLength({ min: 1 })
+        .withMessage('title cannot be empty'),
 ];
 const createCategoryXssClean = [
     body('title')
         .customSanitizer((value) => xss(value)),
 ];
 categoriesRouter.post('/', createCategoryValidation, createCategoryXssClean, catchErrors(createCategoryRoute));
+
+const deleteCategoryValidation = [
+    param('id')
+        .isInt()
+        .withMessage('id verður að vera tala')
+        .toInt()
+];
+const deleteCategoryXssClean = [
+    param('id')
+        .customSanitizer((value) => xss(value))
+];
+
+categoriesRouter.delete('/:id', deleteCategoryValidation, deleteCategoryXssClean, catchErrors(deleteCategoryRoute));
