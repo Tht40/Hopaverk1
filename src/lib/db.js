@@ -187,36 +187,36 @@ export async function updateMenuItem(id, title, price, description, category) {
     UPDATE public.items SET
   `;
 
-  let params = [];
+  const params = [];
   let nrOfParams = 0;
 
   if (title) {
-    nrOfParams = nrOfParams + 1;
-    q = q + ` title=$${nrOfParams},`;
+    nrOfParams += 1;
+    q += ` title=$${nrOfParams},`;
     params.push(title);
   }
 
   if (price) {
-    nrOfParams = nrOfParams + 1;
-    q = q + ` price=$${nrOfParams},`;
+    nrOfParams += 1;
+    q += ` price=$${nrOfParams},`;
     params.push(price);
   }
 
   if (description) {
-    nrOfParams = nrOfParams + 1;
-    q = q + ` description=$${nrOfParams},`;
+    nrOfParams += 1;
+    q += ` description=$${nrOfParams},`;
     params.push(description);
   }
 
   if (category) {
-    nrOfParams = nrOfParams + 1;
-    q = q + ` category=$${nrOfParams},`;
+    nrOfParams += 1;
+    q += ` category=$${nrOfParams},`;
     params.push(category);
   }
 
-  q = q + ` updated=CURRENT_TIMESTAMP`;
+  q += ' updated=CURRENT_TIMESTAMP';
 
-  q = q + ` WHERE id=$${nrOfParams + 1}`;
+  q += ` WHERE id=$${nrOfParams + 1}`;
   params.push(id);
 
   await query(q, params);
@@ -359,7 +359,7 @@ export async function findCartById(id) {
     FROM
       cart
     WHERE
-      cartid = $1
+      cartid.uuid::text = '$1'
   `;
 
   const result = await query(q, [id]);
@@ -393,7 +393,7 @@ export async function addToCart(cartid, itemID) {
     INSERT INTO
       line
     VALUES
-      $1, $2
+      ($1, $2)
   `;
 
   const result = await query(q, [cartid, itemID]);

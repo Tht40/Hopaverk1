@@ -25,7 +25,6 @@ async function postCartRoute(req, res, next) {
   const newCart = await createCart()
 
   if (!newCart) {
-    console.log('hehe');
     next();
     return;
   }
@@ -92,7 +91,7 @@ cartRouter.post('/', catchErrors(postCartRoute));
 
 cartRouter.get('/:cartid', catchErrors(getCartidRoute));
 
-cartRouter.post('/:cartid,', catchErrors(addItem));
+cartRouter.post('/:cartid', catchErrors(addItem));
 /*
 
 cartRouter.delete('/:slug',);

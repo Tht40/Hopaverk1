@@ -50,7 +50,7 @@ CREATE TABLE public.items
     CREATE TABLE public.line
     (
       cartid uuid,
-      id INTEGER,
+      id SERIAL,
       total INTEGER,
       FOREIGN KEY (cartid) REFERENCES cart(cartid),
       FOREIGN KEY (id) REFERENCES items(id)
