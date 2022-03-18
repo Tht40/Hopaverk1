@@ -303,6 +303,55 @@ export async function listItems() {
   return null;
 }
 
+export async function createOrders() {
+  const q = `
+    INSERT INTO orders
+    VALUES
+    $1, $2
+    RETURNING orderid;
+  `;
+
+  const result = await query(q, []);
+
+  if (result) {
+    return result.rows[0];
+  }
+  return null;
+}
+
+
+export async function listOrders() {
+  const q = 'SELECT * FROM orders';
+
+  try {
+    const result = await query(q);
+
+    if (result.rowCount === 1) {
+      return result.rows[0];
+    }
+  } catch (e) {
+    console.error('Engar pantanir fundust');
+  }
+
+  return null;
+}
+
+export async function findOrderById(id) {
+  const q = 'SELECT * FROM orders WHERE id = $1';
+
+  try {
+    const result = await query(q, [id]);
+
+    if (result.rowCount === 1) {
+      return result.rows[0];
+    }
+  } catch (e) {
+    console.error('Gat ekki fundið pöntun eftir id');
+  }
+
+  return null;
+}
+
 export async function findCartById(id) {
   const q = `
     SELECT

@@ -53,7 +53,7 @@ usersRouter.post(
 usersRouter.post('/register', (req, res) => {
 
   const { name, username, password } = req.body;
-  if (findByUsername(username) === {}) {
+  if (JSON.stringify(findByUsername(username)) === '{}') {
     createUser(name, username, password);
     const token = 'token here';
     res.json({ token });
