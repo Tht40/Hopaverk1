@@ -38,13 +38,11 @@ CREATE TABLE public.items
     WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-    CREATE TABLE public.order
-    (
-      orderid uuid PRIMARY KEY default uuid_generate_v4(),
-      created TIMESTAMP
-      WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
- name VARCHAR
-      (64) NOT NULL
+  CREATE TABLE public.order
+  (
+    orderid uuid PRIMARY KEY default uuid_generate_v4(),
+    created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    name VARCHAR(64) NOT NULL
 );
 
       CREATE TABLE public.line
@@ -66,7 +64,7 @@ CREATE TABLE public.items
         itemid SERIAL,
         total INTEGER,
 
-        FOREIGN KEY (orderid) REFERENCES order(orderid),
+        FOREIGN KEY (orderid) REFERENCES public.order(orderid),
         FOREIGN KEY (itemid) REFERENCES items(itemid)
 
       );

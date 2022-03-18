@@ -1,8 +1,9 @@
 # Vefforritun 2 hópverkefni 1
 
 ## Meðlimir hópsins
-
-Steinar Logi Geirsson - slg24@hi.is
+|   Nafn    |  HÍ-mail |    github username |
+|-----------|:---------|-------------------:|
+Steinar Logi Geirsson | slg24@hi.is | steinarlogi |
 
 # Keyra vefþjónustuna
 
@@ -16,6 +17,9 @@ npm run start # eða `npm run dev`
 
 # Dæmi um köll
 ## Fá token til þess að auðkenna
+Username: admin
+password: 123
+
 Senda POST requestu á /users/login með username=admin og password=123 í body
 skilar token til baka. Tokeninn er notaður sem Bearer token í authorization headernum til þess að senda
 requestur á endapunkta sem krefjast auðkenningar.
@@ -34,14 +38,6 @@ GET á /menu?category=2 Skilar öllum vörum sem tilheyra flokki með id 2.
 ## Endapunktar sem krefjast þess að notandi sé auðkenndur
 Til þess að búa til nýja vöru á matseðli þarf að senda POST requestu á /menu. Gögnin í body þarf að senda sem multipart/form-data. Body þarf að innihalda title(strengur), description(strengur), category(heiltala), price(heiltala) og picture(image/jpeg eða image/png). Myndin er vistuð á clodunary og hlekkur að myndinni geymdur í gagnagrunni.
 
-```bash
-createdb vef2-2022-v2
-createdb vef2-2022-v2-test
-# setja upp .env & .env.test með tengingu í gagnagrunna
-npm install
-npm run test
-npm run setup
-npm start # eða `npm run dev`
-```
+DELETE á /menu/{id} eyðir gögnum um vöru á matseðli með id = {id}
 
-admin aðgangur - username: admin / password: 123
+DELETE á /categories{id} eyðir gögnum um vöru á matseðli með id={id}

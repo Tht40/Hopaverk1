@@ -225,17 +225,19 @@ export async function createCart() {
   return null;
 }
 
-export async function createOrder() {
+export async function createOrder(name) {
   const q = `
-    INSERT INTO order
+    INSERT INTO public.order
+    (orderid, created, name)
     VALUES
-    (DEFAULT, DEFAULT)
-    RETURNING orderid;
+    (DEFAULT, DEFAULT, $1)
+    RETURNING orderid, name;
   `;
 
-  const result = await query(q);
+  const result = await query(q, [name]);
 
   if (result) {
+
     return result.rows[0];
   }
   return null;
