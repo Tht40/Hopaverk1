@@ -31,7 +31,7 @@ async function getMenuRoute(req, res) {
         page = 1;
     }
 
-    page -= -1;
+    page -= 1;
 
     // Fallið sækir eftir category ef category er ekki null
     // Annars sækir fallið alla items.

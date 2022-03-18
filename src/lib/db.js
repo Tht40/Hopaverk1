@@ -64,10 +64,10 @@ export async function getMenu(offset, limit, category, search) {
 
   let nrOfArguments = 0;
 
-  let q = 'SELECT * FROM public.items';
+  let q = `SELECT * FROM public.items`;
 
   if (category || search) {
-    q += ' WHERE';
+    q += ` WHERE`;
   }
 
   if (category) {

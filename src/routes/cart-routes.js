@@ -90,7 +90,6 @@ async function eventRoute(req, res, next) {
 
 cartRouter.post('/', catchErrors(postCartRoute));
 
-
 cartRouter.get('/:cartid', catchErrors(getCartidRoute));
 
 cartRouter.post('/:cartid,', catchErrors(addItem));
