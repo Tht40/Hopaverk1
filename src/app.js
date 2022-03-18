@@ -70,8 +70,7 @@ app.use((req, res) => {
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   console.error(err);
-  const title = 'Villa kom upp';
-  res.status(500).render('error', { title });
+  res.json({ msg: '500 Internal server error' });
 });
 
 const server = app.listen(port, () => {

@@ -28,7 +28,7 @@ VALUES
 INSERT INTO public.order
     (orderid, name)
 VALUES
-    ('f4fe8717-9db3-467d-a12f-b5b8de909531','pöntun1');
+    ('f4fe8717-9db3-467d-a12f-b5b8de909531', 'pöntun1');
 
 
 
