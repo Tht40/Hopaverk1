@@ -40,7 +40,7 @@ CREATE TABLE public.items
 
     CREATE TABLE public.order
     (
-      id uuid PRIMARY KEY default uuid_generate_v4(),
+      orderid uuid PRIMARY KEY default uuid_generate_v4(),
       created TIMESTAMP
       WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
  name VARCHAR
@@ -55,6 +55,18 @@ CREATE TABLE public.items
         total INTEGER,
 
         FOREIGN KEY (cartid) REFERENCES cart(cartid),
+        FOREIGN KEY (itemid) REFERENCES items(itemid)
+
+      );
+
+      CREATE TABLE public.lineorder
+      (
+        id serial primary key,
+        orderid uuid,
+        itemid SERIAL,
+        total INTEGER,
+
+        FOREIGN KEY (orderid) REFERENCES order(orderid),
         FOREIGN KEY (itemid) REFERENCES items(itemid)
 
       );
