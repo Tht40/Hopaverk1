@@ -8,9 +8,9 @@ import { isInvalid } from './lib/template-helpers.js';
 import { cartRouter } from './routes/cart-routes.js';
 import { indexRouter } from './routes/index-routes.js';
 import { categoriesRouter, menuRouter } from './routes/menu-router.js';
+import { ordersRouter } from './routes/orders-routes.js';
 import { usersRouter } from './routes/users-routes.js';
 import { websockets } from './websocket-server.js';
-
 
 dotenv.config();
 
@@ -56,6 +56,7 @@ app.use('/users', usersRouter);
 app.use('/menu', menuRouter);
 app.use('/categories', categoriesRouter);
 app.use('/cart', cartRouter);
+app.use('/orders', ordersRouter);
 app.use('/', indexRouter);
 
 

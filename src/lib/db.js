@@ -225,6 +225,22 @@ export async function createCart() {
   return null;
 }
 
+export async function createOrder() {
+  const q = `
+    INSERT INTO order
+    VALUES
+    (DEFAULT, DEFAULT)
+    RETURNING orderid;
+  `;
+
+  const result = await query(q);
+
+  if (result) {
+    return result.rows[0];
+  }
+  return null;
+}
+
 export async function createEvent({ name, slug, description } = {}) {
   const q = `
     INSERT INTO events
