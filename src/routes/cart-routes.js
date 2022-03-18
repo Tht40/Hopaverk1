@@ -3,8 +3,8 @@ import express from 'express';
 import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
 import {
-  addToCart, createCart, deleteCart, findCartById, findLinesInCart,
-  getLineInCart, getMenuItemById, updateCartLine
+  addToCart, createCart, deleteCart, deleteLine, findCartById,
+  findLinesInCart, getLineInCart, getMenuItemById, updateCartLine
 } from '../lib/db.js';
 
 
@@ -178,28 +178,35 @@ async function patchCartLine(req, res) {
 
   const updatedline = await updateCartLine(total, cartid);
 
-  res.json({ data: updatedline, msg: 'total updated' })
-
-
-
-
-
-
+  res.json({ data: updatedline, msg: 'total updated' });
 
 }
-/*
 
-async function eventRoute(req, res, next) {
-  const { cartid } = req.params;
-  const cart = await listCart(slug);
 
-  if (!cart) {
-    return next();
+async function deleteWholeLine(req, res, next) {
+  const valResults = validationResult(req);
+  const { cartid, id } = req.params;
+
+  if (!valResults.isEmpty()) {
+    res.status(400).json({ msg: '400 Bad request', data: valResults.errors });
+
+    return;
   }
+  const line = await getLineInCart(cartid, id);
 
-  return cart  total price og öllum items í cart ;
+
+  if (!line) {
+    res.json({ msg: 'no line with that id exists' });
+
+    next();
+    return;
+  }
+  const templineid = line.id;
+  await deleteLine(line.id);
+
+  res.json({ msg: '200 deleted line with id: ', data: templineid });
+
 }
-*/
 
 
 cartRouter.post('/', catchErrors(postCartRoute));
@@ -213,6 +220,8 @@ cartRouter.delete('/:cartid', catchErrors(deleteWholeCart));
 cartRouter.get('/:cartid/line/:id', catchErrors(getoneLine));
 
 cartRouter.patch('/:cartid/line/:id', catchErrors(patchCartLine));
+
+cartRouter.delete('/:cartid/line/:id', catchErrors(deleteWholeLine));
 /*
 
 cartRouter.delete('/:slug',);
