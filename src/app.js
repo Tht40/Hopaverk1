@@ -5,8 +5,11 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import passport from './lib/login.js';
 import { isInvalid } from './lib/template-helpers.js';
+import { cartRouter } from './routes/cart-routes.js';
+import { indexRouter } from './routes/index-routes.js';
 import { categoriesRouter, menuRouter } from './routes/menu-router.js';
 import { usersRouter } from './routes/users-routes.js';
+
 
 dotenv.config();
 
@@ -51,6 +54,8 @@ app.locals = {
 app.use('/users', usersRouter);
 app.use('/menu', menuRouter);
 app.use('/categories', categoriesRouter);
+app.use('/cart', cartRouter);
+app.use('/', indexRouter);
 
 
 /** Middleware sem sér um 404 villur. */
