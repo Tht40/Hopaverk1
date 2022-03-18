@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import { ExtractJwt, Strategy as JWTStrategy } from 'passport-jwt';
-import { getUserByUsername } from './db.js';
 
 const { TOKEN_SECRET } = process.env;
 
@@ -22,11 +21,7 @@ export function generateAccessToken(user) {
 }
 
 export async function ensureIsAdmin(req, res, next) {
-    const { token } = req.body;
-    const { username } = jwt.verify(token, TOKEN_SECRET);
-    const user = await getUserByUsername(username);
-    const { admin } = user;
-
+    const { admin } = req.user;
     if (!admin || admin == '0') {
         res.json({ message: 'Notandi hefur ekki réttindi' });
     }

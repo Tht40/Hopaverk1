@@ -103,7 +103,7 @@ export async function getMenu(offset, limit, category, search) {
 
 export async function getMenuItemById(id) {
   const q = `
-    SELECT * FROM public.items WHERE id = $1;
+    SELECT * FROM public.items WHERE itemid = $1;
   `;
 
   const results = await query(q, [id]);
@@ -298,6 +298,16 @@ export async function updateCategory(id, title) {
   await query(q, [title, id]);
 }
 
+export async function updateCartLine(total, cartid) {
+  const q = `
+  UPDATE public.line SET total=$1 WHERE cartid=$2
+`;
+
+  await query(q, [total, cartid]);
+}
+
+
+
 export async function insertMenuItem(title, description, category, price, url = 'Not uploaded') {
   const q = `
     INSERT INTO public.items (title, price, description, category, image)
@@ -340,6 +350,14 @@ export async function deleteCategory(id) {
 export async function deleteCart(id) {
   const q = `
     DELETE FROM public.cart WHERE cartid = $1;
+  `;
+
+  await query(q, [id]);
+}
+
+export async function deleteLine(id) {
+  const q = `
+    DELETE FROM public.line WHERE id = $1;
   `;
 
   await query(q, [id]);
@@ -476,7 +494,7 @@ export async function findLinesInCart(cartid) {
     FROM
       line
     WHERE
-      id::text = $1;
+      cartid = $1;
   `;
 
   const result = await query(q, [cartid]);
@@ -487,13 +505,32 @@ export async function findLinesInCart(cartid) {
 
   return null;
 }
+
+export async function getLineInCart(cartid, lineid) {
+  const q = `
+    SELECT *
+    FROM
+      line
+    WHERE
+      cartid = $1 AND id = $2;
+  `;
+
+  const result = await query(q, [cartid, lineid]);
+  if (result) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+
+
 export async function addToCart(cartid, itemID, numberOfItems) {
   const q = `
     INSERT INTO line
-      (cartid, id, total)
+      (cartid, itemid, total)
     VALUES
       ($1, $2, $3)
-    RETURNING cartid, id, total;
+    RETURNING cartid, itemid, total;
   `;
 
   const result = await query(q, [cartid, itemID, numberOfItems]);
@@ -526,7 +563,7 @@ export async function listEvents() {
 export async function listUsers() {
   const q = `
     SELECT
-     name, username, id
+     name, username, id, admin
     FROM
       users
   `;

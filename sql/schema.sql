@@ -9,7 +9,7 @@ CREATE TABLE public.categories
 
 CREATE TABLE public.items
 (
-  id SERIAL PRIMARY KEY,
+  itemid SERIAL PRIMARY KEY,
   title VARCHAR(64) NOT NULL UNIQUE,
   price INTEGER NOT NULL,
   description TEXT NOT NULL,
@@ -49,12 +49,13 @@ CREATE TABLE public.items
 
       CREATE TABLE public.line
       (
+        id serial primary key,
         cartid uuid,
-        id SERIAL,
+        itemid SERIAL,
         total INTEGER,
 
         FOREIGN KEY (cartid) REFERENCES cart(cartid),
-        FOREIGN KEY (id) REFERENCES items(id)
+        FOREIGN KEY (itemid) REFERENCES items(itemid)
 
       );
 

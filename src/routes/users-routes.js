@@ -3,9 +3,10 @@ import express from 'express';
 import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
 import { getPasswordByUsername, getUserByUsername, listUsers } from '../lib/db.js';
-import { ensureIsAdmin, generateAccessToken } from '../lib/jwt-tools.js';
-import { createUser, findById, findByUsername } from '../lib/users.js';
+import { ensureIsAdmin, generateAccessToken, jwtPassport } from '../lib/jwt-tools.js';
+import { createUser, findById } from '../lib/users.js';
 
+const { TOKEN_SECRET } = process.env;
 export const usersRouter = express.Router();
 
 // Föll fyrir login routerinn
@@ -18,7 +19,6 @@ async function loginRoute(req, res) {
   }
 
   const { username, password } = req.body;
-  console.log(username, password);
 
   const selectedPassword = await getPasswordByUsername(username);
   const selectedUser = await getUserByUsername(username);
@@ -49,6 +49,8 @@ async function loginRoute(req, res) {
 }
 
 async function allUsers(req, res) {
+  console.log(req.user);
+
   const users = await listUsers();
 
   res.json({
@@ -62,7 +64,7 @@ async function viewUser(req, res) {
   if (!user) {
     res.JSON({ message: 'User not found.' });
   }
-  const userToSend = {
+  const User = {
     id: user.id,
     name: user.name,
     username: user.username,
@@ -70,26 +72,48 @@ async function viewUser(req, res) {
   };
 
   res.json({
-    userToSend
+    User
   });
 }
 
+async function viewMe(req, res) {
+  res.json(
+    req.user
+  );
+}
 
-usersRouter.get('/:slug', catchErrors(viewUser));
+async function patchMe(req, res) {
+  const { slug } = req.params;
+  const user = await findById(slug);
+  if (!user) {
+    res.JSON({ message: 'User not found.' });
+  }
+}
 
-usersRouter.get('/', ensureIsAdmin, catchErrors(allUsers));
 
-usersRouter.post(
-  '/login',
-  catchErrors(loginRoute)
-);
+async function patchUser(req, res) {
+  const { slug } = req.params;
+  const user = req.user
+  const message = "Admin user cannot revoke admin rights."
+}
+}
+
+usersRouter.get('/me', jwtPassport.authenticate('jwt', { session: false }), catchErrors(viewMe));
+usersRouter.patch('/me', jwtPassport.authenticate('jwt', { session: false }), catchErrors(patchMe));
+
+usersRouter.get('/:slug', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, catchErrors(viewUser));
+usersRouter.patch('/:slug', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, catchErrors(patchUserAdmin));
+
+usersRouter.get('/', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, catchErrors(allUsers));
+
+usersRouter.post('/login', catchErrors(loginRoute));
 
 // býr til nýjann account
 usersRouter.post('/register', (req, res) => {
 
   const { name, username, password } = req.body;
 
-  if (JSON.stringify(findByUsername(username)) === '{}') {
+  if (JSON.stringify(getUserByUsername(username)) === '{}') {
     createUser(name, username, password);
 
     const selectedUser = getUserByUsername(username);
