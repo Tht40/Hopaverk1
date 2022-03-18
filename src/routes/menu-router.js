@@ -331,6 +331,7 @@ async function changeCategory(req, res, next) {
         return;
     }
 
+    /*eslint-disable-next-line*/
     if (categoryByTitle && categoryByTitle.id != id) {
         res.status(400).json({
             msg: '400 Bad request',

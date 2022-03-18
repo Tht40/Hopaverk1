@@ -226,6 +226,20 @@ export async function getUserByUsername(username) {
   return results.rows[0];
 }
 
+export async function getUserById(id) {
+  const q = `
+  SELECT id, name, username, admin FROM public.users WHERE id=$1
+`;
+
+  const results = await query(q, [id]);
+
+  if (results.rows.length === 0) {
+    return null;
+  }
+
+  return results.rows[0];
+}
+
 export async function createCart() {
   const q = `
     INSERT INTO cart
@@ -284,6 +298,22 @@ export async function updateMenuItemImage(id, url) {
   `;
 
   await query(q, [url, id]);
+}
+
+export async function updateUserInfo(val, username) {
+  const q = `
+    UPDATE public.items SET password=$1 WHERE username=$2
+  `;
+
+  await query(q, [val, username]);
+}
+
+export async function updateAdmin(val, id) {
+  const q = `
+    UPDATE public.items SET admin=$1 WHERE id=$2
+  `;
+
+  await query(q, [val, id]);
 }
 
 export async function updateMenuItem(id, title, price, description, category) {

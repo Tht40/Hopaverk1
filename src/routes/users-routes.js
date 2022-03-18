@@ -3,7 +3,7 @@ import express from 'express';
 import { query, validationResult } from 'express-validator';
 import xss from 'xss';
 import { catchErrors } from '../lib/catch-errors.js';
-import { getPasswordByUsername, getUserByUsername, listUsers } from '../lib/db.js';
+import { getPasswordByUsername, getUserByUsername, listUsers, updateUserInfo } from '../lib/db.js';
 import { ensureIsAdmin, generateAccessToken, jwtPassport } from '../lib/jwt-tools.js';
 import { createUser, findById } from '../lib/users.js';
 
@@ -48,6 +48,7 @@ async function loginRoute(req, res) {
   res.json({ token });
 }
 
+// eslint-disable-next-line no-unused-vars
 async function allUsers(req, res) {
   const valResults = validationResult(req);
 
@@ -113,18 +114,29 @@ async function viewMe(req, res) {
 }
 
 async function patchMe(req, res) {
-  const { slug } = req.params;
-  const user = await findById(slug);
-  if (!user) {
-    res.JSON({ message: 'User not found.' });
-  }
+  const { username } = req.user;
+  const password = req.body;
+
+  await updateUserInfo(username, password);
+  const message = username + " password chaged to:" + password;
+  res.JSON(message);
 }
 
 
 async function patchUser(req, res) {
   const { slug } = req.params;
-  const { } = req.user;
-  const message = "Admin user cannot revoke his own admin rights.";
+  const { id, admin } = req.user;
+  if (id === slug) {
+    const message = "Admin user cannot revoke his own admin rights.";
+    res.JSON(message);
+  }
+
+  if (admin === '0') {
+    await updateAdmin('1', id);
+  }
+  else {
+    await updateAdmin('0', id);
+  }
 
 }
 

@@ -6,7 +6,7 @@ import { ensureIsAdmin, jwtPassport } from '../lib/jwt-tools.js';
 
 export const ordersRouter = express.Router();
 
-
+// eslint-disable-next-line no-unused-vars
 async function allOrders(req, res) {
   const orders = await listOrders();
   res.json(
@@ -59,7 +59,7 @@ async function viewOrderHistory(req, res) {
   });
 }
 
-
+// eslint-disable-next-line no-unused-vars
 async function updateOrder(req, res) {
   return null;
 }
@@ -70,8 +70,10 @@ async function updateOrder(req, res) {
 ordersRouter.get('/:slug', catchErrors(viewOrder));
 
 ordersRouter.get('/:slug/status', catchErrors(viewOrderHistory));
-ordersRouter.post('/:slug/status', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, catchErrors(updateOrder));
+ordersRouter.post('/:slug/status', jwtPassport.authenticate('jwt', { session: false }),
+  ensureIsAdmin, catchErrors(updateOrder));
 
 
-ordersRouter.get('/', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, catchErrors(allOrders));
+ordersRouter.get('/', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin,
+  catchErrors(allOrders));
 ordersRouter.post('/', catchErrors(newOrder));
