@@ -1,18 +1,17 @@
 import express from 'express';
 import { validationResult } from 'express-validator';
 import { catchErrors } from '../lib/catch-errors.js';
-import { createOrder, findOrderById } from '../lib/db.js';
+import { createOrder, findOrderById, listOrders } from '../lib/db.js';
 import { ensureIsAdmin, jwtPassport } from '../lib/jwt-tools.js';
 
 export const ordersRouter = express.Router();
 
 
 async function allOrders(req, res) {
-  const orders = await findOrderById();
-
-  res.json({
+  const orders = await listOrders();
+  res.json(
     orders
-  });
+  );
 }
 
 async function newOrder(req, res, next) {
@@ -27,8 +26,7 @@ async function newOrder(req, res, next) {
 
   const Order = await createOrder(name)
   if (!Order) {
-    next();
-    return;
+    res.json({ data: Order });
   }
 
   res.json({ data: Order });
