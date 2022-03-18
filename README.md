@@ -2,7 +2,7 @@
 
 ## Meðlimir hópsins
 |   Nafn    |  HÍ-mail |    github username |
-|-----------|:---------|-------------------:|
+|-----------|----------|--------------------|
 Steinar Logi Geirsson | slg24@hi.is | steinarlogi |
 
 # Keyra vefþjónustuna
