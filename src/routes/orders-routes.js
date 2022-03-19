@@ -9,6 +9,8 @@ import { ensureIsAdmin, jwtPassport } from '../lib/jwt-tools.js';
 
 export const ordersRouter = express.Router();
 
+/* eslint-disable prefer-template */
+
 // eslint-disable-next-line no-unused-vars
 async function allOrders(req, res) {
     let { page } = req.query;
@@ -32,7 +34,7 @@ async function allOrders(req, res) {
                 href: url + '/orders?page=' + page
             },
             previous: {
-                href: url + '/orders?page=' + (page == 1 ? page : page - 1),
+                href: url + '/orders?page=' + (page === 1 ? page : page - 1),
             },
             next: {
                 href: url + '/orders?page=' + (page + 1),
@@ -79,11 +81,13 @@ async function viewOrder(req, res) {
 
     if (!order) {
         res.JSON({ message: 'Engin pöntun fannst.' });
+        return;
     }
 
     const cart = await findLinesInCart(orderid);
     if (!cart) {
         res.JSON({ message: 'Engin karfa fannst.' });
+        return;
     }
 
     let totalcost = 0;
@@ -136,8 +140,7 @@ async function updateOrder(req, res) {
     return null;
 }
 
-
-
+/* eslint-enablee prefer-template */
 
 ordersRouter.get('/:orderid', catchErrors(viewOrder));
 

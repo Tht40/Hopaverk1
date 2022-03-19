@@ -47,7 +47,7 @@ async function loginRoute(req, res) {
 
   res.json({ token });
 }
-
+/* eslint-disable prefer-template */
 // eslint-disable-next-line no-unused-vars
 async function allUsers(req, res) {
   const valResults = validationResult(req);
@@ -64,11 +64,11 @@ async function allUsers(req, res) {
     page = 1;
   }
 
-  page = page - 1;
+  page -= 1;
 
   const users = await listUsers(limit * page, limit);
 
-  page = page + 1;
+  page += 1;
 
   const url = req.protocol + '://' + req.get('host');
 
@@ -80,7 +80,7 @@ async function allUsers(req, res) {
         href: url + '/users?page=' + page,
       },
       previous: {
-        href: url + '/users?page=' + (page == 1 ? page : page - 1),
+        href: url + '/users?page=' + (page === 1 ? page : page - 1),
       },
       next: {
         href: url + '/users?page=' + (page + 1),
@@ -88,6 +88,8 @@ async function allUsers(req, res) {
     }
   });
 }
+
+/* eslint-enable prefer-template */
 
 async function viewUser(req, res) {
   const { slug } = req.params;
@@ -118,7 +120,7 @@ async function patchMe(req, res) {
   const password = req.body;
 
   await updateUserInfo(username, password);
-  const message = username + " password chaged to:" + password;
+  const message = `${username} password chaged to: ${password}`;
   res.JSON(message);
 }
 
@@ -127,7 +129,7 @@ async function patchUser(req, res) {
   const { slug } = req.params;
   const { id, admin } = req.user;
   if (id === slug) {
-    const message = "Admin user cannot revoke his own admin rights.";
+    const message = 'Admin user cannot revoke his own admin rights.';
     res.JSON(message);
   }
 

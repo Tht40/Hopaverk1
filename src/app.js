@@ -54,7 +54,7 @@ app.use('/menu', menuRouter);
 app.use('/categories', categoriesRouter);
 app.use('/cart', cartRouter);
 app.use('/orders', ordersRouter);
-//app.use('/', indexRouter);
+// app.use('/', indexRouter);
 
 /** Middleware sem sér um 404 villur. */
 app.use((req, res) => {

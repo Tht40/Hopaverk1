@@ -521,6 +521,7 @@ export async function setOrderState(status, id) {
 
 }
 
+/*eslint-disable-next-line*/
 export async function updateOrderState(status, id) {
   return null;
 }

@@ -45,7 +45,7 @@ async function getMenuRoute(req, res) {
     // Annars sækir fallið alla items.
     const menuItems = await getMenu(page * limit, limit, category, search);
     /* eslint-disable prefer-template */
-    let url = req.protocol + '://' + req.get('host') + '/menu' + '?';
+    let url = req.protocol + '://' + req.get('host') + '/menu?';
 
     if (category) {
         url += 'category=' + category + '&';
@@ -331,7 +331,7 @@ async function changeCategory(req, res, next) {
         return;
     }
 
-    /*eslint-disable-next-line*/
+    /* eslint-disable-next-line */
     if (categoryByTitle && categoryByTitle.id != id) {
         res.status(400).json({
             msg: '400 Bad request',
