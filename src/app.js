@@ -9,7 +9,7 @@ import { cartRouter } from './routes/cart-routes.js';
 import { categoriesRouter, menuRouter } from './routes/menu-router.js';
 import { ordersRouter } from './routes/orders-routes.js';
 import { usersRouter } from './routes/users-routes.js';
-import { websockets } from './websocket-server.js';
+// import { websockets } from './websocket-server.js';
 
 dotenv.config();
 
@@ -24,7 +24,7 @@ if (!connectionString || !sessionSecret) {
   process.exit(1);
 }
 
-const app = express();
+export const app = express();
 
 // Sér um að req.body innihaldi gögn úr formi
 app.use(express.urlencoded({ extended: true }));
@@ -72,4 +72,4 @@ const server = app.listen(port, () => {
   console.info(`Server running at http://localhost:${port}/`);
 });
 
-websockets(server);
+// websockets(server);

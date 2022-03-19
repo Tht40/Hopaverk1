@@ -23,6 +23,12 @@ Hægt er að keyra eslint með því að keyra
 npm run lint
 ```
 
+Hægt er að keyra test með því að keyra 
+
+```bash
+npm run test
+```
+
 # Dæmi um köll
 ## Fá token til þess að auðkenna
 Username: admin
