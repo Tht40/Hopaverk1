@@ -17,6 +17,12 @@ npm run setup
 npm run start # eða `npm run dev`
 ```
 
+Hægt er að keyra eslint með því að keyra
+
+````bash
+npm run lint
+```
+
 # Dæmi um köll
 ## Fá token til þess að auðkenna
 Username: admin
