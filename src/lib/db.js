@@ -256,16 +256,16 @@ export async function createCart() {
   return null;
 }
 
-export async function createOrder(name) {
+export async function createOrder(cartid, name) {
   const q = `
     INSERT INTO public.order
     (orderid, created, name)
     VALUES
-    (DEFAULT, DEFAULT, $1)
+    ($1, DEFAULT, $2)
     RETURNING orderid, name;
   `;
 
-  const result = await query(q, [name]);
+  const result = await query(q, [cartid, name]);
 
   if (result) {
 
@@ -489,25 +489,45 @@ export async function listItems() {
   return null;
 }
 
-export async function createOrders() {
+export async function seeOrderState(id) {
   const q = `
-    INSERT INTO orders
-    VALUES
-    $1, $2
-    RETURNING orderid;
+  SELECT * FROM public.statusorder WHERE orderid = $1
   `;
 
-  const result = await query(q, []);
+  const result = await query(q, [id]);
+
+  if (result) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+
+export async function setOrderState(status, id) {
+  const q = `
+    INSERT INTO public.statusorder
+    (orderlvl, orderid)
+    VALUES
+    ($1, $2)
+    RETURNING orderlvl;
+  `;
+
+  const result = await query(q, [status, id]);
 
   if (result) {
     return result.rows[0];
   }
   return null;
+
+}
+
+export async function updateOrderState(status, id) {
+  return null;
 }
 
 
 export async function listOrders() {
-  const q = 'SELECT * FROM public.order ORDER BY created';
+  const q = 'SELECT * FROM public.order ORDER BY created desc';
 
   try {
     const result = await query(q);
@@ -523,19 +543,19 @@ export async function listOrders() {
 }
 
 export async function findOrderById(id) {
-  const q = 'SELECT * FROM orders WHERE id = $1';
+  const q = `
+    SELECT * FROM public.order WHERE orderid = $1;
+  `;
 
-  try {
-    const result = await query(q, [id]);
+  const result = await query(q, [id]);
 
-    if (result.rowCount === 1) {
-      return result.rows[0];
-    }
-  } catch (e) {
-    console.error('Gat ekki fundið pöntun eftir id');
+  if (result.rows.length === 0) {
+
+    return null;
   }
 
-  return null;
+  return result.rows[0];
+
 }
 
 export async function findCartById(id) {
@@ -564,6 +584,24 @@ export async function findLinesInCart(cartid) {
   `;
 
   const result = await query(q, [cartid]);
+
+  if (result) {
+    return result.rows;
+  }
+
+  return null;
+}
+
+export async function findLinesInOrder(orderid) {
+  const q = `
+    SELECT *
+    FROM
+      lineorder
+    WHERE
+      orderid = $1;
+  `;
+
+  const result = await query(q, [orderid]);
 
   if (result) {
     return result.rows;
