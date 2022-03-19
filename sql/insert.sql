@@ -81,10 +81,10 @@ VALUES
 
 
 INSERT INTO users
-    (name, username, password, admin)
+    (name, username, email, password, admin)
 VALUES
-    ('admin adminsson', 'admin', '$2a$11$pgj3.zySyFOvIQEpD7W6Aund1Tw.BFarXxgLJxLbrzIv/4Nteisii', '1');
+    ('admin adminsson', 'admin', 'admin@admin.is' , '$2a$11$pgj3.zySyFOvIQEpD7W6Aund1Tw.BFarXxgLJxLbrzIv/4Nteisii', '1');
 INSERT INTO users
-    (name, username, password, admin)
+    (name, username, email, password, admin)
 VALUES
-    ('user userson', 'user', '$2a$11$pgj3.zySyFOvIQEpD7W6Aund1Tw.BFarXxgLJxLbrzIv/4Nteisii', '0');
+    ('user userson', 'user', 'user@user.is', '$2a$11$pgj3.zySyFOvIQEpD7W6Aund1Tw.BFarXxgLJxLbrzIv/4Nteisii', '0');

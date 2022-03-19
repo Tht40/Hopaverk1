@@ -39,6 +39,7 @@ async function loginRoute(req, res) {
   const userToSend = {
     id: selectedUser.id,
     name: selectedUser.name,
+    email: selectedUser.email,
     username: selectedUser.username,
     admin: selectedUser.admin,
   };
@@ -100,6 +101,7 @@ async function viewUser(req, res) {
   const User = {
     id: user.id,
     name: user.name,
+    email: user.email,
     username: user.username,
     admin: user.admin,
   };
@@ -120,7 +122,7 @@ async function patchMe(req, res) {
   const password = req.body;
 
   await updateUserInfo(username, password);
-  const message = `${username} password chaged to: ${password}`;
+  const message = `${username} password changed to: ${password}`;
   res.JSON(message);
 }
 
@@ -170,15 +172,16 @@ usersRouter.post('/login', catchErrors(loginRoute));
 // býr til nýjann account
 usersRouter.post('/register', (req, res) => {
 
-  const { name, username, password } = req.body;
+  const { name, username, email, password } = req.body;
 
   if (JSON.stringify(getUserByUsername(username)) === '{}') {
-    createUser(name, username, password);
+    createUser(name, username, email, password);
 
     const selectedUser = getUserByUsername(username);
     const userToSend = {
       id: selectedUser.id,
       name: selectedUser.name,
+      email: selectedUser.email,
       username: selectedUser.username,
       admin: selectedUser.admin,
     };
