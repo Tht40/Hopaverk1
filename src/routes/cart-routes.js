@@ -47,7 +47,10 @@ async function getCartidRoute(req, res, next) {
   }
 
   if (result.length === 0) {
-    res.json({ msg: 'The cart is empty' });
+    res.json({
+      order: cartid,
+      msg: 'The cart is empty'
+    });
     return;
   }
 
