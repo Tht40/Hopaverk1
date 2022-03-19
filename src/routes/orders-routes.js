@@ -1,5 +1,6 @@
 import express from 'express';
-import { validationResult } from 'express-validator';
+import { query, validationResult } from 'express-validator';
+import xss from 'xss';
 import { catchErrors } from '../lib/catch-errors.js';
 import { createOrder, findOrderById, listOrders } from '../lib/db.js';
 import { ensureIsAdmin, jwtPassport } from '../lib/jwt-tools.js';
@@ -8,60 +9,84 @@ export const ordersRouter = express.Router();
 
 // eslint-disable-next-line no-unused-vars
 async function allOrders(req, res) {
-  const orders = await listOrders();
-  res.json(
-    orders
-  );
+    let { page } = req.query;
+    const limit = 10;
+    if (!page) {
+        page = 1;
+    }
+
+    page -= 1;
+
+    const orders = await listOrders(page * limit, limit);
+    const url = req.protocol + '://' + req.get('host');
+
+    page += 1;
+
+    res.json({
+        msg: '200 OK',
+        data: orders,
+        _links: {
+            self: {
+                href: url + '/orders?page=' + page
+            },
+            previous: {
+                href: url + '/orders?page=' + (page == 1 ? page : page - 1),
+            },
+            next: {
+                href: url + '/orders?page=' + (page + 1),
+            }
+        }
+    });
 }
 
 async function newOrder(req, res, next) {
-  const valResults = validationResult(req);
-  const { name } = req.body;
+    const valResults = validationResult(req);
+    const { name } = req.body;
 
 
-  if (!valResults.isEmpty()) {
-    next();
-    return
-  }
+    if (!valResults.isEmpty()) {
+        next();
+        return
+    }
 
-  const Order = await createOrder(name)
-  if (!Order) {
+    const Order = await createOrder(name)
+    if (!Order) {
+        res.json({ data: Order });
+    }
+
     res.json({ data: Order });
-  }
-
-  res.json({ data: Order });
 }
 
 async function viewOrder(req, res) {
-  const { slug } = req.params;
-  const order = await findOrderById(slug);
+    const { slug } = req.params;
+    const order = await findOrderById(slug);
 
-  if (!order) {
-    res.JSON({ message: 'Engin pöntun fannst.' });
-  }
+    if (!order) {
+        res.JSON({ message: 'Engin pöntun fannst.' });
+    }
 
-  res.json({
-    order
-  });
+    res.json({
+        order
+    });
 }
 
 
 async function viewOrderHistory(req, res) {
-  const { slug } = req.params;
-  const order = await findOrderById(slug);
+    const { slug } = req.params;
+    const order = await findOrderById(slug);
 
-  if (!order) {
-    res.JSON({ message: 'Engin pöntun fannst.' });
-  }
+    if (!order) {
+        res.JSON({ message: 'Engin pöntun fannst.' });
+    }
 
-  res.json({
-    order
-  });
+    res.json({
+        order
+    });
 }
 
 // eslint-disable-next-line no-unused-vars
 async function updateOrder(req, res) {
-  return null;
+    return null;
 }
 
 
@@ -71,9 +96,19 @@ ordersRouter.get('/:slug', catchErrors(viewOrder));
 
 ordersRouter.get('/:slug/status', catchErrors(viewOrderHistory));
 ordersRouter.post('/:slug/status', jwtPassport.authenticate('jwt', { session: false }),
-  ensureIsAdmin, catchErrors(updateOrder));
+    ensureIsAdmin, catchErrors(updateOrder));
 
-
-ordersRouter.get('/', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin,
-  catchErrors(allOrders));
+const allOrdersValidation = [
+    query('page')
+        .optional()
+        .isInt()
+        .withMessage('id must be an integer')
+        .toInt(),
+];
+const allOrdersXss = [
+    query('page')
+        .customSanitizer((value) => xss(value)),
+];
+ordersRouter.get('/', jwtPassport.authenticate('jwt', { session: false }), ensureIsAdmin, allOrdersValidation, allOrdersXss,
+    catchErrors(allOrders));
 ordersRouter.post('/', catchErrors(newOrder));

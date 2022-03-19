@@ -3,6 +3,8 @@ import { WebSocketServer } from 'ws';
 
 let websocketServer;
 
+let connections = [];
+
 function receiveMessage(message) {
     const parsedMessage = JSON.parse(message);
 }

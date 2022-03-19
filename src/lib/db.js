@@ -506,11 +506,11 @@ export async function createOrders() {
 }
 
 
-export async function listOrders() {
-  const q = 'SELECT * FROM public.order ORDER BY created';
+export async function listOrders(offset = 0, limit = 10) {
+  const q = 'SELECT * FROM public.order ORDER BY created OFFSET $1 LIMIT $2';
 
   try {
-    const result = await query(q);
+    const result = await query(q, [offset, limit]);
 
     if (result) {
       return result.rows;
