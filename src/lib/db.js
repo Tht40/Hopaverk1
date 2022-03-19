@@ -516,7 +516,7 @@ export async function setOrderState(status, id) {
     (orderlvl, orderid)
     VALUES
     ($1, $2)
-    RETURNING orderlvl;
+    RETURNING orderlvl, updated;
   `;
 
   const result = await query(q, [status, id]);
@@ -530,7 +530,13 @@ export async function setOrderState(status, id) {
 
 /*eslint-disable-next-line*/
 export async function updateOrderState(status, id) {
-  return null;
+  const q = `
+    UPDATE public.statusorder SET orderlvl=$1 WHERE orderid = $2;
+  `;
+
+  await query(q, [status, id]);
+
+
 }
 
 
