@@ -69,3 +69,13 @@ CREATE TABLE public.items
 
       );
 
+      CREATE TABLE public.statusorder
+      (
+        id serial primary key,
+        orderid uuid,
+        orderlvl VARCHAR(64),
+        updated TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+        FOREIGN KEY (orderid) REFERENCES public.order(orderid)
+      )
+
