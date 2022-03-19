@@ -528,7 +528,7 @@ export async function setOrderState(status, id) {
 
 }
 
-/*eslint-disable-next-line*/
+/* eslint-disable-next-line */
 export async function updateOrderState(status, id) {
   const q = `
     UPDATE public.statusorder SET orderlvl=$1 WHERE orderid = $2;
