@@ -1,11 +1,12 @@
 import bcrypt from 'bcrypt';
+import { validate } from 'email-validator';
 import express from 'express';
 import { query, validationResult } from 'express-validator';
 import xss from 'xss';
 import { catchErrors } from '../lib/catch-errors.js';
-import { getPasswordByUsername, getUserByUsername, listUsers, updateUserInfo } from '../lib/db.js';
+import { getPasswordByUsername, getUserByUsername, listUsers, updateAdmin, updateUserEmail, updateUserPassword } from '../lib/db.js';
 import { ensureIsAdmin, generateAccessToken, jwtPassport } from '../lib/jwt-tools.js';
-import { createUser, findById } from '../lib/users.js';
+import { createUser, findById, findByUsername } from '../lib/users.js';
 
 export const usersRouter = express.Router();
 
@@ -119,27 +120,37 @@ async function viewMe(req, res) {
 
 async function patchMe(req, res) {
   const { username } = req.user;
-  const password = req.body;
+  const { email, password } = req.body;
 
-  await updateUserInfo(username, password);
-  const message = `${username} password changed to: ${password}`;
-  res.JSON(message);
+  await updateUserPassword(password, username);
+  if (validate(email)) {
+    await updateUserEmail(email, username);
+  }
+
+  const userToSend = await findByUsername(username);
+  const token = generateAccessToken(userToSend);
+
+  res.json({ token, userToSend });
 }
 
 
 async function patchUser(req, res) {
   const { slug } = req.params;
-  const { id, admin } = req.user;
-  if (id === slug) {
-    const message = 'Admin user cannot revoke his own admin rights.';
-    res.JSON(message);
+  const { username, id, admin } = req.user;
+  if (String(id) === slug) {
+    console.log("erher")
+    return res.json({ message });
   }
 
-  if (admin === '0') {
-    await updateAdmin('1', id);
+  else if (admin === '0') {
+    await updateAdmin('1', username);
+    const message = `${username} admin status changed to: True`;
+    res.json({ message });
   }
-  else {
-    await updateAdmin('0', id);
+  else if (admin === '1') {
+    await updateAdmin('0', username);
+    const message = `${username} admin status changed to: False`;
+    res.json({ message });
   }
 
 }

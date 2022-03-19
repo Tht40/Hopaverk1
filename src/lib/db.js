@@ -307,20 +307,28 @@ export async function updateMenuItemImage(id, url) {
   await query(q, [url, id]);
 }
 
-export async function updateUserInfo(val, username) {
+export async function updateUserPassword(val, username) {
   const q = `
-    UPDATE public.items SET password=$1 WHERE username=$2
+    UPDATE public.users SET password=$1 WHERE username=$2
   `;
 
   await query(q, [val, username]);
 }
 
-export async function updateAdmin(val, id) {
+export async function updateUserEmail(val, username) {
   const q = `
-    UPDATE public.items SET admin=$1 WHERE id=$2
+    UPDATE public.users SET email=$1 WHERE username=$2
   `;
 
-  await query(q, [val, id]);
+  await query(q, [val, username]);
+}
+
+export async function updateAdmin(val, username) {
+  const q = `
+    UPDATE public.users SET admin=$1 WHERE username=$2
+  `;
+
+  await query(q, [val, username]);
 }
 
 export async function updateMenuItem(id, title, price, description, category) {
